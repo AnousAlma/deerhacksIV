@@ -30,7 +30,7 @@ export default function EventsPage() {
 
    return (
    // 1) Full-page container with the dark background
-   <div className="bg-[#1a1f3d] text-white min-h-screen">
+   <div className=" text-white min-h-screen">
      {/* 2) Header at the top */}
  
 
