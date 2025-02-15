@@ -34,14 +34,18 @@ export default function Header() {
       {/* Navbar (h-12 => small height) */}
       <nav className="h-12 flex items-center justify-between px-6 bg-[#1a1f3d] shadow">
         {/* Left side: brand/logo */}
+        <Link href="/">
         <div className="flex items-center gap-2">
+      
           <img
-            src="/images/crest-small.png"
+            src="/images/logo.png"
             alt="UofT Crest"
-            className="w-6 h-6"
+            className="w-16 h-16"
           />
           <span className="text-base font-bold">Discover UofT</span>
+    
         </div>
+        </Link>
 
         {/* Right side: includes Create Event link */}
         <div className="flex items-center gap-4">
