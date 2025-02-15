@@ -1,6 +1,6 @@
 // components/Post.tsx
-"use client"; 
-// If you plan to use any React state/hooks in this component, keep "use client" at the top
+"use client";
+import { TAG_INFO } from "./tag"; // adjust path
 
 interface PostProps {
   id: number;
@@ -8,7 +8,7 @@ interface PostProps {
   description: string;
   date?: string;
   location?: string;
-  post_tag?: string;  // e.g., "online" or "discord"
+  post_tag?: string;
 }
 
 export default function Post({
@@ -18,16 +18,22 @@ export default function Post({
   location,
   post_tag,
 }: PostProps) {
+  // Retrieve the info from the map, or use a default if missing
+  const tagInfo = post_tag ? TAG_INFO[post_tag] : undefined;
+
   return (
     <div className="border p-4 rounded shadow-sm">
       <h2 className="text-xl font-semibold">{title}</h2>
       <p>{description}</p>
       {date && <p className="text-sm">Date: {date}</p>}
       {location && <p className="text-sm">Location: {location}</p>}
-      {post_tag && (
-        <p className="text-sm">
-          Tag: {post_tag === "online" ? "Online" : "Discord"}
-        </p>
+
+      {/* If we found a matching tag in the map, show its label and icon */}
+      {tagInfo && (
+        <div className="flex items-center gap-2 mt-2">
+          <img src={tagInfo.icon} alt={tagInfo.label} width={24} height={24} />
+          <span className="text-sm">{tagInfo.label}</span>
+        </div>
       )}
     </div>
   );
