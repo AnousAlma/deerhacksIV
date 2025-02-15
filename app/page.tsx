@@ -33,19 +33,17 @@ export default function EventsPage() {
           </button>
         </div>
       </div>
-
-      {/* 2-column grid (1 col on smaller screens, 2 cols on md and up) */}
+      {/* 2-column grid (1  col on smaller screens, 2 cols on md and up) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {currentPosts.map((event) => (
           <Post key={event.id} {...event} />
         ))}
       </div>
-
-      <Pagination
+      {/* <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
-      />
+      /> */}
     </div>
   );
 }
