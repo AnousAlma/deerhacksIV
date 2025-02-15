@@ -1,33 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // from Next.js 13's app router
+import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // Make a request to your login API route
+    // Basic password check
+    if (password !== confirm) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    // Make a request to your signup API route
     try {
-      const res = await fetch("/api/login", {
+      const res = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       if (!res.ok) {
-        throw new Error("Login failed");
+        throw new Error("Signup failed");
       }
 
-      // If login is successful, perhaps redirect to the dashboard
-      router.push("/dashboard");
+      // If signup is successful, go to login
+      router.push("/login");
     } catch (err) {
       console.error(err);
-      alert("Login failed. Check your credentials and try again.");
+      alert("Signup failed. Please try again.");
     }
   }
 
@@ -37,7 +44,7 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded shadow-md w-full max-w-md"
       >
-        <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+        <h1 className="text-2xl font-bold mb-4 text-center">Sign Up</h1>
 
         <label className="block mb-2 font-medium">Email</label>
         <input
@@ -57,17 +64,26 @@ export default function LoginPage() {
           required
         />
 
+        <label className="block mb-2 font-medium">Confirm Password</label>
+        <input
+          type="password"
+          className="w-full p-2 mb-4 border rounded"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          required
+        />
+
         <button
           type="submit"
           className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
         >
-          Login
+          Sign Up
         </button>
 
         <p className="text-center mt-4">
-          Don&rsquo;t have an account?{" "}
-          <a href="/signup" className="text-blue-600 hover:underline">
-            Sign up
+          Already have an account?{" "}
+          <a href="/login" className="text-blue-600 hover:underline">
+            Login
           </a>
         </p>
       </form>

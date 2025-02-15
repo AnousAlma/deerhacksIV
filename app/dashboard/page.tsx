@@ -4,7 +4,7 @@ import Post from "../components/post"; // Adjust path if needed
 // Mock function: In a real app, you'd fetch from a database or API
 async function fetchUserPosts() {
   // Suppose these are the posts created by the current user
-  return [
+    return [
     {
       id: 1,
       title: "I created this event",
