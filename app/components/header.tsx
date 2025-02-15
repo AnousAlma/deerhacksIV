@@ -2,7 +2,12 @@
 import Link from "next/link";
 import ThemeToggle from "./themetoggle";
 
+import { signOut } from "next-auth/react"
+import { useSession } from "next-auth/react"
+
 export default function Header() {
+    const { data: session, status } = useSession()
+
     return (
         <header>
             <nav className="flex flex-wrap items-center justify-between px-6 bg-[#1a1f3d] shadow">
@@ -17,15 +22,20 @@ export default function Header() {
                     </div>
                 </Link>
                 <div className="flex items-center gap-4">
-                    {/* <Link href="/create" className="hover:underline text-white">
-                        Create Event
-                    </Link> */}
+                    { session ? (
                     <Link href="/dashboard" className="hover:underline text-white">
                         Dashboard
-                    </Link>
+                    </Link>) : (
+                            <p className="text-slate-500 cursor-default">
+                                Dashboard
+                            </p>
+                    )}
+                    
+                    {!session ? (
                     <Link href="/login" className="hover:underline text-white">
                         Login
                     </Link>
+                    ) : (<button className="hover:underline text-white" onClick={() => signOut()}>Sign Out</button>)}
                     <ThemeToggle />
                 </div>
             </nav>
