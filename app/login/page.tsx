@@ -1,8 +1,11 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // from Next.js 13's app router
+import { signIn } from "next-auth/react";
+
+import { useSession } from "next-auth/react"
+
 
 export default function LoginPage() {
     const router = useRouter();
@@ -10,6 +13,12 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
 
+    const { data: session, status } = useSession()
+
+    if (status === "authenticated") {
+        router.push("/dashboard");
+        return;
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -22,50 +31,78 @@ export default function LoginPage() {
         if (res?.error) {
             setError("Invalid email or password");
         } else {
-            router.push("/dashboard"); 
+            router.push("/dashboard");
         }
     };
-    
+
+    const handleOAuthLogin = (provider: string) => {
+        signIn(provider, { redirect: false }).then((res) => {
+            if (res?.error) {
+                setError(`Error with ${provider} login`);
+            } else {
+                router.push("/dashboard");
+            }
+        });
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <form
-                onSubmit={handleSubmit}
-                className="bg-white p-6 rounded shadow-md w-full max-w-md"
+            <button
+                onClick={() => handleOAuthLogin("github")}
+                className="w-200 bg-gray-800 text-white p-2 rounded hover:bg-gray-900"
             >
-                <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+                Login with GitHub
+            </button>
 
-                <label className="block mb-2 font-medium">Email</label>
-                <input
-                    type="email"
-                    className="w-full p-2 mb-4 border rounded"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
+            <button
+                onClick={() => handleOAuthLogin("google")}
+                className="w-200 bg-red-600 text-white p-2 rounded hover:bg-red-700"
+            >
+                Login with Google
+            </button>
 
-                <label className="block mb-2 font-medium">Password</label>
-                <input
-                    type="password"
-                    className="w-full p-2 mb-4 border rounded"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
 
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+            <div className="">
+                <p>{error}</p>
+                <form
+                    onSubmit={handleSubmit}
+                    className="bg-white p-6 rounded shadow-md w-full max-w-md"
                 >
-                    Login
-                </button>
+                    <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
 
-                <p className="text-center mt-4">
-                    Don&rsquo;t have an account?{" "}
-                    <a href="/signup" className="text-blue-600 hover:underline">
-                        Sign up
-                    </a>
-                </p>
-            </form>
+                    <label className="block mb-2 font-medium">Email</label>
+                    <input
+                        type="email"
+                        className="w-full p-2 mb-4 border rounded"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+
+                    <label className="block mb-2 font-medium">Password</label>
+                    <input
+                        type="password"
+                        className="w-full p-2 mb-4 border rounded"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+                    >
+                        Login
+                    </button>
+
+                    <p className="text-center mt-4">
+                        Don&rsquo;t have an account?{" "}
+                        <a href="/signup" className="text-blue-600 hover:underline">
+                            Sign up
+                        </a>
+                    </p>
+                </form>
+            </div>
         </div>
     );
 }
