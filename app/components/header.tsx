@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import ThemeToggle from "./ThemeToggle";
+import ThemeToggle from "./themetoggle";
 
 export default function Header() {
     return (
@@ -17,9 +17,9 @@ export default function Header() {
                     </div>
                 </Link>
                 <div className="flex items-center gap-4">
-                    <Link href="/create" className="hover:underline text-white">
+                    {/* <Link href="/create" className="hover:underline text-white">
                         Create Event
-                    </Link>
+                    </Link> */}
                     <Link href="/dashboard" className="hover:underline text-white">
                         Dashboard
                     </Link>

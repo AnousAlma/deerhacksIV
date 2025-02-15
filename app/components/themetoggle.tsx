@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import { FiSun, FiMoon } from 'react-icons/fi';
 
 export default function ThemeToggle() {
     const [theme, setTheme] = useState("light");
@@ -11,11 +12,20 @@ export default function ThemeToggle() {
     return (
         <button
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            // Light mode => gray background, dark text
-            // Dark mode => black background, white text
-            className="p-2 bg-gray-200 text-black dark:bg-gray-800 dark:text-white rounded"
+            className="p-3 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
         >
-            Toggle {theme === "light" ? "Dark" : "Light"} Mode
+            {theme === "light" ? (
+                <FiMoon 
+                    className="w-7 h-7 text-white hover:text-gray-400" 
+                    strokeWidth={1.5}
+                />
+            ) : (
+                <FiSun 
+                    className="w-7 h-7 text-yellow-400 hover:text-yellow-300" 
+                    strokeWidth={1.5}
+                />
+            )}
         </button>
     );
 }
