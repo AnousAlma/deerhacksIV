@@ -47,6 +47,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <p>{error}</p>
             <button
                 onClick={() => handleOAuthLogin("github")}
                 className="w-200 bg-gray-800 text-white p-2 rounded hover:bg-gray-900"
@@ -61,9 +62,8 @@ export default function LoginPage() {
                 Login with Google
             </button>
 
-
+{/* 
             <div className="">
-                <p>{error}</p>
                 <form
                     onSubmit={handleSubmit}
                     className="bg-white p-6 rounded shadow-md w-full max-w-md"
@@ -102,7 +102,7 @@ export default function LoginPage() {
                         </a>
                     </p>
                 </form>
-            </div>
+            </div> */}
         </div>
     );
 }
