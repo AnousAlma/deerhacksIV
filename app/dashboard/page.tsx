@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Typography } from "@mui/material";
-import Post from "../components/post"; // Adjust path if needed
+import Post from "@/components/Post"; // Adjust path if needed
 import post_img from "../../public/images/hero-img.png";
 import { Filter, Plus } from "lucide-react";
 import Link from 'next/link'

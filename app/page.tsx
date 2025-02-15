@@ -1,12 +1,16 @@
 "use client";
 import { Filter } from "lucide-react";
-import Post from "./components/post";
+
 import fetchData, { getFeaturedImages } from "./lib/events";
-import Pagination from "./components/Pagination";
+
 import { useState } from "react";
-import Header from "./components/header";
-import Gallery from "./components/gallery";
 import Select from "react-select";
+
+import Pagination from "./components/Pagination";
+import Post from "./components/Post";
+import Header from "./components/Header";
+import Gallery from "./components/Gallery";
+
 
 const POSTS_PER_PAGE = 8;
 

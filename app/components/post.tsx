@@ -3,7 +3,7 @@ import Image from "next/image";
 import { FaInstagram, FaDiscord, FaClock, FaMapMarkerAlt } from "react-icons/fa"; // Added new icons
 import { useState } from "react";
 import { X } from "lucide-react";
-import { TAG_INFO } from "./tag";
+import { TAG_INFO } from "./PostTag";
 
 
 interface PostProps {
