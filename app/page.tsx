@@ -4,157 +4,173 @@ import Post from "./components/post";
 import fetchData, { getFeaturedImages } from "./lib/events";
 import Pagination from "./components/Pagination";
 import { useState } from "react";
-
 import Header from "./components/header";
 import Gallery from "./components/gallery";
+import Select from "react-select";
 
 const POSTS_PER_PAGE = 8;
 
 export default function EventsPage() {
-    const events = fetchData();            // All events from your data source
-    const [currentPage, setCurrentPage] = useState(1);
-    const [showFilters, setShowFilters] = useState(false);
+  const events = fetchData(); // All events from your data source
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
 
-    // Filter states
-    const [tagFilter, setTagFilter] = useState("");
-    const [orgFilter, setOrgFilter] = useState("");
-    const [dateFilter, setDateFilter] = useState(""); // e.g. "2025-02-01"
+  // Filter and sort states:
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState("newest"); // "newest" or "popularity"
+  const [dateFilter, setDateFilter] = useState(""); // e.g. "2025-02-01"
 
-    const featuredImages = getFeaturedImages();
+  const featuredImages = getFeaturedImages();
 
-    // 1) Filter the events before pagination
-    const filteredEvents = events
-        // Filter by tag (case-insensitive includes)
-        .filter((e) => {
-            if (!tagFilter) return true;
-            // e.tags might be an array of strings, so adapt as needed
-            return e.tags?.some((tag) =>
-                tag.toLowerCase().includes(tagFilter.toLowerCase())
-            );
-        })
-        // Filter by organization (case-insensitive substring match)
-        .filter((e) => {
-            if (!orgFilter) return true;
-            return e.organization?.toLowerCase().includes(orgFilter.toLowerCase());
-        })
-        // Filter by date (only show events on or after the given date)
-        .filter((e) => {
-            if (!dateFilter) return true;
-            return e.date >= dateFilter; // Adjust comparison logic as needed
-        });
+  // CHATGPT generated placeholder tags
+  const availableTags = [
+    "nature", "coding", "music", "sports", "art", "travel", "food", "tech",
+    "education", "health", "science", "history", "literature", "fashion", "politics",
+    "finance", "gaming", "entertainment", "lifestyle", "design", "architecture",
+    "photography", "culture", "business", "innovation", "environment", "animals",
+    "outdoors", "fitness", "movies", "theater", "dance", "comedy", "news", "blogging",
+    "marketing", "social", "community", "religion", "philosophy", "psychology", "spirituality",
+    "diy", "crafts", "automotive", "traveling", "investing", "startups", "parenting", "relationships"
+  ];
 
-    // 2) Pagination on the filtered list
-    const totalPosts = filteredEvents.length;
-    const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+  // Map availableTags to options for react-select.
+  const tagOptions = availableTags.map((tag) => ({ value: tag, label: tag }));
 
-    const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
-    const endIndex = startIndex + POSTS_PER_PAGE;
-    const currentPosts = filteredEvents.slice(startIndex, endIndex);
+  // 1) Filter the events before pagination
+  const filteredEvents = events
+    // Filter by selected tags (if any)
+    .filter((e) => {
+      if (selectedTags.length === 0) return true;
+      const eventTags = e.tags?.map((tag: string) => tag.toLowerCase()) || [];
+      const lowerCaseSelected = selectedTags.map((tag) => tag.toLowerCase());
+      return eventTags.some((tag) => lowerCaseSelected.includes(tag));
+    })
+    // Filter by date (only show events on or after the given date)
+    .filter((e) => {
+      if (!dateFilter) return true;
+      return e.date >= dateFilter;
+    });
 
-    // 3) Handlers
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
+  // 2) Sort the filtered events
+  const sortedEvents = [...filteredEvents].sort((a, b) => {
+    if (sortBy === "newest") {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    } else if (sortBy === "popularity") {
+      return (b.popularity || 0) - (a.popularity || 0);
+    }
+    return 0;
+  });
 
-    const toggleFilters = () => {
-        setShowFilters((prev) => !prev);
-    };
+  // 3) Pagination on the sorted list
+  const totalPosts = sortedEvents.length;
+  const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const endIndex = startIndex + POSTS_PER_PAGE;
+  const currentPosts = sortedEvents.slice(startIndex, endIndex);
 
-    const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTagFilter(e.target.value);
-        setCurrentPage(1);
-    };
+  // Handlers
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
-    const handleOrgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setOrgFilter(e.target.value);
-        setCurrentPage(1);
-    };
+  const toggleFilters = () => {
+    setShowFilters((prev) => !prev);
+  };
 
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setDateFilter(e.target.value);
-        setCurrentPage(1);
-    };
-
-    return (
-        <div className="text-white min-h-screen">
-            {/* Header */}
-
-
-            {/* Featured Images */}
-            <Gallery images={featuredImages} />
-
-            {/* Main container */}
-            <div className="max-w-7xl mx-auto p-4">
-                {/* Title + Filter icon */}
-                <div className="flex items-center justify-between mb-4 mt-8">
-                    <p className="text-2xl">Posts</p>
-                    <button
-                        onClick={toggleFilters}
-                        className="p-2 rounded-md hover:bg-gray-200"
-                    >
-                        <Filter className="w-6 h-6 text-black" />
-                    </button>
-                </div>
-
-                {/* Filter panel (shown/hidden via showFilters) */}
-                {showFilters && (
-                    <div className="bg-gray-700 p-4 mb-4 rounded">
-                        <div className="flex flex-col md:flex-row md:items-center gap-4">
-                            {/* Tag filter */}
-                            <div className="flex flex-col">
-                                <label htmlFor="tagFilter">Tag</label>
-                                <input
-                                    id="tagFilter"
-                                    type="text"
-                                    className="text-black p-1"
-                                    placeholder="e.g. music"
-                                    value={tagFilter}
-                                    onChange={handleTagChange}
-                                />
-                            </div>
-
-                            {/* Organization filter */}
-                            <div className="flex flex-col">
-                                <label htmlFor="orgFilter">Organization</label>
-                                <input
-                                    id="orgFilter"
-                                    type="text"
-                                    className="text-black p-1"
-                                    placeholder="e.g. Computer Science Club"
-                                    value={orgFilter}
-                                    onChange={handleOrgChange}
-                                />
-                            </div>
-
-                            {/* Date filter */}
-                            <div className="flex flex-col">
-                                <label htmlFor="dateFilter">Date</label>
-                                <input
-                                    id="dateFilter"
-                                    type="date"
-                                    className="text-black p-1"
-                                    value={dateFilter}
-                                    onChange={handleDateChange}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Posts */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {currentPosts.map((event) => (
-                        <Post key={event.id} {...event} />
-                    ))}
-                </div>
-
-                {/* Pagination */}
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                />
-            </div>
-        </div>
+  // Handler for react-select multi-select dropdown.
+  const handleTagSelectChange = (selectedOptions: any) => {
+    setSelectedTags(
+      selectedOptions ? selectedOptions.map((option: any) => option.value) : []
     );
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDateFilter(e.target.value);
+    setCurrentPage(1);
+  };
+
+  return (
+    <div className="text-white min-h-screen">
+      {/* Featured Images */}
+      <Gallery images={featuredImages} />
+
+      {/* Main container */}
+      <div className="max-w-7xl mx-auto p-4">
+        {/* Title + Filter icon */}
+        <div className="flex items-center justify-between mb-4 mt-8">
+          <p className="text-2xl">Posts</p>
+          {/* <button onClick={toggleFilters} className="p-2 rounded-md hover:bg-gray-200">
+            <Filter className="w-6 h-6 text-black" />
+          </button> */}
+        </div>
+
+        {/* Filter panel */}
+       
+          <div className="bg-gray-700 p-4 mb-4 rounded">
+            <div className="flex flex-col md:flex-row md:items-center gap-4">
+              {/* Tag filter dropdown using react-select */}
+              <div className="flex flex-col w-full md:w-1/3">
+                <label htmlFor="tagFilter" className="mb-1">Tags</label>
+                <Select
+                className="text-black"
+                  id="tagFilter"
+                  options={tagOptions}
+                  isMulti
+                  value={tagOptions.filter(option => selectedTags.includes(option.value))}
+                  onChange={handleTagSelectChange}
+                  placeholder="Select tags..."
+                />
+              </div>
+
+              {/* Sorting */}
+              <div className="flex flex-col w-full md:w-1/3">
+                <label htmlFor="sortBy">Sort</label>
+                <select
+                  id="sortBy"
+                  className="text-black p-1"
+                  value={sortBy}
+                  onChange={handleSortChange}
+                >
+                  <option value="newest">Newest to Oldest</option>
+                  <option value="popularity">Popularity</option>
+                </select>
+              </div>
+
+              {/* Date filter */}
+              <div className="flex flex-col w-full md:w-1/3">
+                <label htmlFor="dateFilter">Date</label>
+                <input
+                  id="dateFilter"
+                  type="date"
+                  className="text-black p-1"
+                  value={dateFilter}
+                  onChange={handleDateChange}
+                />
+              </div>
+            </div>
+          </div>
+
+
+        {/* Posts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {currentPosts.map((event) => (
+            <Post key={event.id} {...event} />
+          ))}
+        </div>
+
+        {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
+    </div>
+  );
 }

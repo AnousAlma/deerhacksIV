@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 import Post from "../components/post"; // Adjust path if needed
 import post_img from "../../public/images/hero-img.png";
 import { Filter, Plus } from "lucide-react";
-
+import Link from 'next/link'
 // Mock function: In a real app, you'd fetch from a database or API
 async function fetchUserPosts() {
   // Suppose these are the posts created by the current user
@@ -92,9 +92,11 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between mb-4 mt-8">
          <p className="text-2xl">Posts</p>
          <div className="flex items-center gap-4">
-           <button className="p-2 rounded-md hover:bg-gray-200">
+            <Link href = "/create">
+           <button  className="p-2 rounded-md hover:bg-gray-200">
              <Plus className="w-6 h-6 text-black" />
            </button>
+           </Link>
            <button className="p-2 rounded-md hover:bg-gray-200">
              <Filter className="w-6 h-6 text-black" />
            </button>
