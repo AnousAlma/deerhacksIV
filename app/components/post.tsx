@@ -108,7 +108,7 @@ const Modal = ({ isOpen, onClose, children }) => {
        <div className="flex-1 p-6 relative">
          <h2 className="text-xl font-semibold mb-1">{title}</h2>
          <p className="text-sm text-gray-300 mb-2">{formattedDate}</p>
-         <p className="text-gray-300 text-sm md:text-base mb-2">
+         <p className="text-gray-300 text-sm md:text-base mb-2 pr-4">
            {description}
          </p>
          {location && (
@@ -173,7 +173,7 @@ const Modal = ({ isOpen, onClose, children }) => {
    />
  )}
 </div>
-<div className="p-6 text-white">
+<div className="p-6 text-white ">
  <h2 className="text-2xl font-semibold mb-2">{title}</h2>
  <div className="flex items-center gap-6 mb-4">
    <div className="flex items-center gap-2">

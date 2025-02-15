@@ -10,8 +10,8 @@
 
 /* Light Mode (if you explicitly use data-theme="light") */
 [data-theme="light"] {
-  --background: #3b657f; /* White background */
-  --foreground: #fffff; /* Black text */
+  --background: #fff; /* White background */
+  --foreground: #000; /* Black text */
 }
 
 /* Dark Mode */
