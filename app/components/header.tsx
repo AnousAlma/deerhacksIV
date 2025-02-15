@@ -37,7 +37,12 @@ export default function Header() {
   }
 
   return (
-    <>
+    <div
+    style={{
+      height: "100vh",
+      backgroundColor: "#1F2937"
+
+    }}>
       {/* Top Header with centered title & nav on the right */}
       <header className="relative bg-white dark:bg-gray-800 shadow h-16 flex items-center justify-center">
         {/* Centered Title */}
@@ -114,6 +119,6 @@ export default function Header() {
           </div>
         </section>
       )}
-    </>
+    </div>
   );
 }
