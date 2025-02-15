@@ -3,7 +3,7 @@ interface UserData {
     events_clicked: string[];
 }
 
-interface Events {
+export interface Events {
     [eventName: string]: number[];
 }
 
@@ -60,18 +60,34 @@ const TAGS: { [key: number]: string } = {
     49: "Community"
 };
 
-// If you want to rank all the events set topN to the number of events
 function recommendEvents(userData: UserData, events: Events, topN: number = 5): string[] {
-    const preferences = new Set(userData.preferences);
-    const clickedEvents = new Set(userData.events_clicked);
+    const tagWeights: { [tag: number]: number } = {};
+
+    // Assign weights for preferences (double weight)
+    for (const tag of userData.preferences) {
+        tagWeights[tag] = (tagWeights[tag] || 0) + 2;
+    }
+
+    // Assign weights for tags from clicked events (single weight)
+    for (const eventName of userData.events_clicked) {
+        for (const tag of events[eventName]) {
+            tagWeights[tag] = (tagWeights[tag] || 0) + 1;
+        }
+    }
 
     const eventScores: { [eventName: string]: number } = {};
 
     for (const [eventName, eventTags] of Object.entries(events)) {
-        let score = eventTags.filter(tag => preferences.has(tag)).length;
-        if (clickedEvents.has(eventName)) {
-            score -= 1;
+        let score = eventTags.reduce((acc, tag) => acc + (tagWeights[tag] || 0), 0);
+
+        // Penalize clicked events
+        if (userData.events_clicked.includes(eventName)) {
+            score -= 4;
         }
+
+        // Add slight randomness between -0.5 and 0.5
+        score += (Math.random() - 0.5);
+
         eventScores[eventName] = score;
     }
 
@@ -83,10 +99,21 @@ function recommendEvents(userData: UserData, events: Events, topN: number = 5): 
     return sortedEvents;
 }
 
+
+
+
+
 const userData: UserData = {
-    preferences: [9, 12, 15, 26, 32],
+    preferences: [9, 12, 15, 26, 32], // Robotics, Engineering, Writing, Business, Yoga
     events_clicked: ["Robotics Workshop", "Campus Art Exhibition", "Hackathon 2023"]
 };
+
+// const userData: UserData = {
+//     preferences: [21, 20, 19, 24, 26], // Sustainability, Environment, Politics, Networking, Business
+//     events_clicked: ["Environmental Sustainability Panel", "Math Problem-Solving Workshop", 
+//         "Cooking Class: Italian Cuisine", "Running Club Meetup", 
+//         "Career Fair 2023"]
+// };
 
 const events: Events = {
     "Robotics Workshop": [9, 10, 12],
