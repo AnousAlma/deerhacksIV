@@ -1,7 +1,11 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: [
+      "images-ext-1.discordapp.net",
+      // add other allowed domains here
+    ],
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
