@@ -7,16 +7,16 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #25439e;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
+  background-color: var(--background);
   color: var(--foreground);
-  background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -25,10 +25,11 @@ body {
 
 }
 
-[data-theme="dark"] {
-  --tw-bg-opacity: 1;
-  background-color: rgba(31, 41, 55, var(--tw-bg-opacity)); /* e.g., bg-gray-800 */
-  color: #fff;
+[data-theme="light"] {
+  --background: #4b76b3; /* e.g., a dark gray */
+  --foreground: black;
 }
-
-
+[data-theme="dark"] {
+  --background: #1f2937; /* e.g., a dark gray */
+  --foreground: #4b76b3;
+}
