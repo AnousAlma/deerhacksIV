@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { FaInstagram, FaDiscord, FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import { FaInstagram, FaDiscord, FaClock, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { X } from "lucide-react";
 
@@ -12,6 +12,7 @@ interface PostProps {
     endDate: Date;
     location: string;
     img_src?: string;
+    isDashboard?: boolean;
 }
 
 const dateFormat = new Intl.DateTimeFormat("en-US", {
@@ -52,6 +53,7 @@ export default function Post({
     endDate,
     location,
     img_src,
+    isDashboard,
 }: PostProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -61,9 +63,9 @@ export default function Post({
 
     const formattedStartDate = dateFormat.format(new Date(startDate));
     const formattedEndDate = dateFormat.format(new Date(endDate));
-  // Conditional formatting variables for card and modal displays
-  let dateDisplayCard;
-  let dateDisplayModal;
+    // Conditional formatting variables for card and modal displays
+    let dateDisplayCard;
+    let dateDisplayModal;
 
     if (startDateObj && endDateObj) {
         const sameDay =
@@ -123,16 +125,16 @@ export default function Post({
             );
             dateDisplayModal = (
                 <>
-          <div className="flex items-center gap-2">
-                    <FaClock className="text-gray-300 w-4 h-4" />
-                    <span className="text-gray-300">Start: {formattedStart}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <FaClock className="text-gray-300 w-4 h-4" />
-                    <span className="text-gray-300">End: {formattedEnd}</span>
-                </div>
-            </>
-      );
+                    <div className="flex items-center gap-2">
+                        <FaClock className="text-gray-300 w-4 h-4" />
+                        <span className="text-gray-300">Start: {formattedStart}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <FaClock className="text-gray-300 w-4 h-4" />
+                        <span className="text-gray-300">End: {formattedEnd}</span>
+                    </div>
+                </>
+            );
         }
     } else {
         dateDisplayCard = (
@@ -157,6 +159,11 @@ export default function Post({
 
     const handleCardClick = () => {
         setIsModalOpen(true);
+    };
+
+    const handleDelete = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent triggering the card click
+        console.log("Delete post with ID:", id); // Add your delete logic here
     };
 
     return (
@@ -220,6 +227,16 @@ export default function Post({
                         <div className="p-2 bg-gray-700 rounded-md cursor-pointer transition-colors duration-200 hover:bg-white group">
                             <FaDiscord className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-gray-700" />
                         </div>
+
+                        {/* Trash can icon (only for dashboard) */}
+                        {isDashboard && (
+                            <div
+                                className="p-2 bg-red-600 rounded-md cursor-pointer transition-colors duration-200 hover:bg-red-500 group"
+                                onClick={handleDelete}
+                            >
+                                <FaTrash className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-white" />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -267,18 +284,19 @@ export default function Post({
                                             : tag === "Poker"
                                                 ? "bg-purple-500 text-black"
                                                 : "bg-gray-700 text-gray-200";
-              return (
-                <span
-                        key={idx}
-                        className={`${tagColor} px-3 py-1 rounded-full text-xs`}
-                    >
-                        {tag}
-                    </span>
-                    );
-            })}
+
+                            return (
+                                <span
+                                    key={idx}
+                                    className={`${tagColor} px-3 py-1 rounded-full text-xs`}
+                                >
+                                    {tag}
+                                </span>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
-        </Modal >
-    </>
-  );
+            </Modal>
+        </>
+    );
 }
