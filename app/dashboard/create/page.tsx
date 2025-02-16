@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { motion } from "framer-motion";
+import { Upload, Calendar, MapPin, MessageCircle, Instagram } from "lucide-react";
 
 import { parseEventDetails } from "@/lib/utils/eventToTags";
 import { uploadToImgur } from "@/lib/utils/imgurUpload";
@@ -12,6 +14,7 @@ import { uploadToImgur } from "@/lib/utils/imgurUpload";
 export default function CreateEventPage() {
     const router = useRouter();
     const { data: session, status } = useSession();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (!session) {
@@ -20,46 +23,39 @@ export default function CreateEventPage() {
         }
     }, [session, router]);
 
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [location, setLocation] = useState("");
-    const [startDate, setStartDate] = useState<Date>(new Date());
-    const [endDate, setEndDate] = useState<Date>(new Date());
-    const [discordLink, setDiscordLink] = useState("");
-    const [instagramLink, setInstagramLink] = useState("");
+    const [formData, setFormData] = useState({
+        title: "",
+        description: "",
+        location: "",
+        startDate: new Date(),
+        endDate: new Date(),
+        discordLink: "",
+        instagramLink: "",
+    });
+
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [previewURL, setPreviewURL] = useState<string>("");
     const [error, setError] = useState("");
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
-        if (!session || !session.user) {
+        if (!session?.user) {
             setError("Access denied!");
+            setIsSubmitting(false);
             return;
         }
 
         try {
-            const ownerId = session.user.email;
-
-            const datetime = startDate.toLocaleString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true,
-            });
-
             const data = {
-                title,
-                description,
-                startDate,
-                endDate,
-                location,
-                discordLink,
-                instagramLink,
-                ownerId,
+                ...formData,
+                ownerId: session.user.email,
             };
 
             const response = await fetch("/api/event_post/", {
@@ -68,19 +64,22 @@ export default function CreateEventPage() {
             });
 
             if (!response.ok) {
-                setError("Failed with HTTP status code: " + response.status);
-                return;
-            } else {
-                router.push("/dashboard");
+                throw new Error("Failed with HTTP status code: " + response.status);
             }
+
+            toast.success("Event created successfully!");
+            router.push("/dashboard");
         } catch (error) {
             console.error('Error creating event:', error);
+            toast.error("Failed to create event");
             setError(`Error creating event: ${error}`);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
+        if (e.target.files?.[0]) {
             const file = e.target.files[0];
             setImageFile(file);
 
@@ -88,12 +87,13 @@ export default function CreateEventPage() {
             reader.onload = async (event) => {
                 if (event.target?.result) {
                     setPreviewURL(event.target.result as string);
-
-                    const imgurLink = await uploadToImgur(file);
-                    if (imgurLink) {
-                        console.log("Uploaded to Imgur:", imgurLink);
-                    } else {
-                        console.error("Error uploading to Imgur");
+                    try {
+                        const imgurLink = await uploadToImgur(file);
+                        if (imgurLink) {
+                            toast.success("Image uploaded successfully!");
+                        }
+                    } catch (error) {
+                        toast.error("Failed to upload image");
                     }
                 }
             };
@@ -102,141 +102,214 @@ export default function CreateEventPage() {
     };
 
     return (
-        <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
-            <div className="p-6 w-full max-w-lg">
-                <p className="text-red-500">{error}</p>
-                <h1 className="text-3xl font-bold mb-6 text-center">
-                    Create a New Event
-                </h1>
+        <div className="min-h-screen bg-gradient-to-b from-background to-background/80 text-foreground">
+            <div className="container mx-auto px-4 py-12">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="max-w-2xl mx-auto bg-card rounded-2xl shadow-xl p-8"
+                >
+                    <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                        Create Your Event
+                    </h1>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Title */}
-                    <div>
-                        <label className="block mb-2 text-lg font-medium">
-                            Title
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full h-12 px-4 text-lg rounded bg-background text-foreground border border-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            required
-                        />
-                    </div>
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg"
+                        >
+                            {error}
+                        </motion.div>
+                    )}
 
-                    {/* Description */}
-                    <div>
-                        <label className="block mb-2 text-lg font-medium">
-                            Description
-                        </label>
-                        <textarea
-                            className="w-full h-32 px-4 py-2 text-lg rounded bg-background text-foreground border border-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            required
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <motion.div
+                            whileHover={{ scale: 1.01 }}
+                            className="group"
+                        >
+                            <label className="block mb-2 text-sm font-medium text-muted-foreground">
+                                Title
+                            </label>
+                            <input
+                                type="text"
+                                name="title"
+                                className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                                value={formData.title}
+                                onChange={handleInputChange}
+                                required
+                                placeholder="Give your event a catchy title"
+                            />
+                        </motion.div>
 
-                    {/* Start Date and Time */}
-                    <div>
-                        <label className="block mb-2 text-lg font-medium">
-                            Start Date
-                        </label>
-                        <input
-                            type="datetime-local"
-                            className="w-full h-12 px-4 text-lg rounded bg-background text-foreground border border-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={startDate ? startDate.toISOString().slice(0, 16) : ""}
-                            onChange={(e) => setStartDate(new Date(e.target.value))}
-                            required
-                        />
-                    </div>
+                        <motion.div
+                            whileHover={{ scale: 1.01 }}
+                            className="group"
+                        >
+                            <label className="block mb-2 text-sm font-medium text-muted-foreground">
+                                Description
+                            </label>
+                            <textarea
+                                name="description"
+                                className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input min-h-[120px] transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                required
+                                placeholder="Describe your event in detail"
+                            />
+                        </motion.div>
 
-                    {/* End Date and Time */}
-                    <div>
-                        <label className="block mb-2 text-lg font-medium">
-                            End Date
-                        </label>
-                        <input
-                            type="datetime-local"
-                            className="w-full h-12 px-4 text-lg rounded bg-background text-foreground border border-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={endDate ? endDate.toISOString().slice(0, 16) : ""}
-                            onChange={(e) => setEndDate(new Date(e.target.value))}
-                            required
-                        />
-                    </div>
-
-                    {/* Location */}
-                    <div>
-                        <label className="block mb-2 text-lg font-medium">
-                            Location
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full h-12 px-4 text-lg rounded bg-background text-foreground border border-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={location}
-                            onChange={(e) => setLocation(e.target.value)}
-                        />
-                    </div>
-
-                    {/* Discord Link */}
-                    <div>
-                        <label className="block mb-2 text-lg font-medium">
-                            Discord Link
-                        </label>
-                        <input
-                            type="url"
-                            className="w-full h-12 px-4 text-lg rounded bg-background text-foreground border border-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={discordLink}
-                            onChange={(e) => setDiscordLink(e.target.value)}
-                            placeholder="https://discord.gg/..."
-                        />
-                    </div>
-
-                    {/* Instagram Link */}
-                    <div>
-                        <label className="block mb-2 text-lg font-medium">
-                            Instagram Link
-                        </label>
-                        <input
-                            type="url"
-                            className="w-full h-12 px-4 text-lg rounded bg-background text-foreground border border-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={instagramLink}
-                            onChange={(e) => setInstagramLink(e.target.value)}
-                            placeholder="https://instagram.com/..."
-                        />
-                    </div>
-
-                    {/* Image Upload */}
-                    <div>
-                        <label className="block mb-2 text-lg font-medium">
-                            Event Image
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="text-foreground focus:outline-none"
-                        />
-                        {previewURL && (
-                            <div className="mt-4">
-                                <p className="text-sm text-muted-foreground mb-2">Preview:</p>
-                                <img
-                                    src={previewURL}
-                                    alt="Preview"
-                                    className="w-full h-auto rounded border border-foreground"
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <motion.div
+                                whileHover={{ scale: 1.01 }}
+                                className="group"
+                            >
+                                <label className="block mb-2 text-sm font-medium text-muted-foreground">
+                                    <Calendar className="w-4 h-4 inline-block mr-2" />
+                                    Start Date & Time
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    name="startDate"
+                                    className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                                    value={formData.startDate.toISOString().slice(0, 16)}
+                                    onChange={handleInputChange}
+                                    required
                                 />
-                            </div>
-                        )}
-                    </div>
+                            </motion.div>
 
-                    {/* Submit */}
-                    <button
-                        type="submit"
-                        className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-lg font-semibold rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        Submit
-                    </button>
-                </form>
+                            <motion.div
+                                whileHover={{ scale: 1.01 }}
+                                className="group"
+                            >
+                                <label className="block mb-2 text-sm font-medium text-muted-foreground">
+                                    <Calendar className="w-4 h-4 inline-block mr-2" />
+                                    End Date & Time
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    name="endDate"
+                                    className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                                    value={formData.endDate.toISOString().slice(0, 16)}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </motion.div>
+                        </div>
+
+                        <motion.div
+                            whileHover={{ scale: 1.01 }}
+                            className="group"
+                        >
+                            <label className="block mb-2 text-sm font-medium text-muted-foreground">
+                                <MapPin className="w-4 h-4 inline-block mr-2" />
+                                Location
+                            </label>
+                            <input
+                                type="text"
+                                name="location"
+                                className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                                value={formData.location}
+                                onChange={handleInputChange}
+                                placeholder="Where is your event taking place?"
+                            />
+                        </motion.div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <motion.div
+                                whileHover={{ scale: 1.01 }}
+                                className="group"
+                            >
+                                <label className="block mb-2 text-sm font-medium text-muted-foreground">
+                                    <MessageCircle className="w-4 h-4 inline-block mr-2" />
+                                    Discord Link
+                                </label>
+                                <input
+                                    type="url"
+                                    name="discordLink"
+                                    className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                                    value={formData.discordLink}
+                                    onChange={handleInputChange}
+                                    placeholder="https://discord.gg/..."
+                                />
+                            </motion.div>
+
+                            <motion.div
+                                whileHover={{ scale: 1.01 }}
+                                className="group"
+                            >
+                                <label className="block mb-2 text-sm font-medium text-muted-foreground">
+                                    <Instagram className="w-4 h-4 inline-block mr-2" />
+                                    Instagram Link
+                                </label>
+                                <input
+                                    type="url"
+                                    name="instagramLink"
+                                    className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                                    value={formData.instagramLink}
+                                    onChange={handleInputChange}
+                                    placeholder="https://instagram.com/..."
+                                />
+                            </motion.div>
+                        </div>
+
+                        <motion.div
+                            whileHover={{ scale: 1.01 }}
+                            className="group"
+                        >
+                            <label className="block mb-2 text-sm font-medium text-muted-foreground">
+                                <Upload className="w-4 h-4 inline-block mr-2" />
+                                Event Image
+                            </label>
+                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-input rounded-lg hover:border-blue-500 transition-colors">
+                                <div className="space-y-1 text-center">
+                                    <div className="flex text-sm text-muted-foreground">
+                                        <label
+                                            htmlFor="file-upload"
+                                            className="relative cursor-pointer rounded-md font-medium text-blue-500 hover:text-blue-400 focus-within:outline-none"
+                                        >
+                                            <span>Upload a file</span>
+                                            <input
+                                                id="file-upload"
+                                                type="file"
+                                                className="sr-only"
+                                                accept="image/*"
+                                                onChange={handleFileChange}
+                                            />
+                                        </label>
+                                        <p className="pl-1">or drag and drop</p>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        PNG, JPG, GIF up to 10MB
+                                    </p>
+                                </div>
+                            </div>
+                            {previewURL && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="mt-4"
+                                >
+                                    <img
+                                        src={previewURL}
+                                        alt="Preview"
+                                        className="w-full h-48 object-cover rounded-lg border border-input"
+                                    />
+                                </motion.div>
+                            )}
+                        </motion.div>
+
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            disabled={isSubmitting}
+                            type="submit"
+                            className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isSubmitting ? "Creating Event..." : "Create Event"}
+                        </motion.button>
+                    </form>
+                </motion.div>
             </div>
         </div>
     );
