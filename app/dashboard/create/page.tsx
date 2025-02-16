@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { Upload, Calendar, MapPin, MessageCircle, Instagram } from "lucide-react";
 
 import { parseEventDetails } from "@/lib/utils/eventToTags";
-import { uploadToImgur } from "@/lib/utils/imgurUpload";
+import { uploadToCloudinary } from "@/lib/utils/cloudinaryUpload";
 
 export default function CreateEventPage() {
     const router = useRouter();
@@ -38,35 +38,59 @@ export default function CreateEventPage() {
     const [previewURL, setPreviewURL] = useState<string>("");
     const [error, setError] = useState("");
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSubmitting(true);
-
-        if (!session?.user) {
+    
+        if (!session || !session.user) {
             setError("Access denied!");
             setIsSubmitting(false);
             return;
         }
-
-        const tags = await parseEventDetails(formData.title, formData.description, formData.location, formData.startDate.toISOString());
-
+    
         try {
-            const data = {
-                ...formData,
-                tags,
-                ownerId: session.user.email,
-            };
+            let cloudinaryLink = null;
+    
+            // Upload image to Cloudinary if there's an image file
+            if (imageFile) {
+                cloudinaryLink = await uploadToCloudinary(imageFile); // Use the Cloudinary function
+                if (!cloudinaryLink) {
+                    setError("Failed to upload image to Cloudinary");
+                    return;
+                }
+            }
+    
+            const ownerId = session.user.email;
+            const datetime = startDate.toLocaleString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true,
+            });
+    
+            console.log(cloudinaryLink); // Log the Cloudinary link for debugging
+            const tags = await parseEventDetails(formData.title, formData.description, formData.location, formData.startDate.toISOString());
 
+            const data = {
+                title,
+                description,
+                startDate,
+                endDate,
+                location,
+                ownerId,
+                tags,
+                // imageUrl: cloudinaryLink, // Add the Cloudinary image link to your data
+            };
+    
             const response = await fetch("/api/event_post/", {
                 method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(data),
             });
-
+          
             if (!response.ok) {
                 throw new Error("Failed with HTTP status code: " + response.status);
             }
@@ -74,31 +98,22 @@ export default function CreateEventPage() {
             toast.success("Event created successfully!");
             router.push("/dashboard");
         } catch (error) {
-            console.error('Error creating event:', error);
-            toast.error("Failed to create event");
+            console.error('Error submitting form:', error);
             setError(`Error creating event: ${error}`);
         } finally {
             setIsSubmitting(false);
         }
     };
+    
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files?.[0]) {
             const file = e.target.files[0];
             setImageFile(file);
-
             const reader = new FileReader();
             reader.onload = async (event) => {
                 if (event.target?.result) {
                     setPreviewURL(event.target.result as string);
-                    try {
-                        const imgurLink = await uploadToImgur(file);
-                        if (imgurLink) {
-                            toast.success("Image uploaded successfully!");
-                        }
-                    } catch (error) {
-                        toast.error("Failed to upload image");
-                    }
                 }
             };
             reader.readAsDataURL(file);
