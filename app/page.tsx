@@ -24,10 +24,6 @@ export default function EventsPage() {
     const [isModalOpen, setModalOpen] = useState(false);
     const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
-    const refreshPosts = () => {
-        // Implementation remains the same
-    };
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -43,6 +39,25 @@ export default function EventsPage() {
                 if (!Array.isArray(data)) {
                     throw new Error("Expected an array but got something else");
                 }
+
+                if (minimumDate !== "") {
+                    data = data.filter((event) => {
+                        return new Date(event.startDate) >= new Date(minimumDate);
+                    });
+                }
+
+                if (sortBy === "newest") {
+                    data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                } else if (sortBy === "alphabetical") {
+                    data.sort((a, b) => a.title.localeCompare(b.title));
+                }
+
+                if (selectedTags.length > 0) {
+                    data = data.filter((event) => {
+                        return selectedTags.some((tag) => event.tags.split(',').includes(tag));
+                    });
+                }
+
                 setEvents(data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : "An unknown error occurred");
@@ -183,6 +198,7 @@ export default function EventsPage() {
                         />
                     </div>
                 </div>
+
             </motion.div>
         )}
     </AnimatePresence>
@@ -206,7 +222,6 @@ export default function EventsPage() {
                 className="relative transform transition-all duration-300 hover:scale-[1.02]"
             >
                 {/* Gradient overlay for text */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/60 to-blue-900/90 rounded-xl dark:via-blue-800/60 dark:to-blue-800/90" />
                 <Post {...event} />
             </motion.div>
         ))}
@@ -228,6 +243,7 @@ export default function EventsPage() {
                 )}
             </AnimatePresence>
             <style jsx global>{`
+
                 @keyframes bounce {
                     0%, 100% {
                         transform: translateY(0);
@@ -240,6 +256,7 @@ export default function EventsPage() {
                     animation: bounce 2s infinite;
                 }
             `}</style>
-        </div>
+            </div>
+            </div>
     );
 }

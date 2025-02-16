@@ -17,12 +17,3 @@ export const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER,
     pool: { maxConnections: 5, maxIdleTime: 30 },
     language: 'en'
 });
-
-
-
-
-// export const sequelize = new Sequelize("database_name", "username", "password", {
-//     host: "localhost",
-//     dialect: "mysql",
-// });
-
