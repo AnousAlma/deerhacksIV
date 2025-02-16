@@ -25,6 +25,7 @@ export default function StudentSurveyForm() {
       const userTags = await parseUserAnswers(formData.yearOfStudy, formData.major, formData.hobbies, formData.freeTime, formData.friendsDescription, formData.socialActivity, formData.superpower);
       console.log('User tags:', userTags);
       // *** Append user tags to the user's profile ***
+      localStorage.setItem('userTags', JSON.stringify(userTags));
       router.push("/");
     } catch (error) {
       console.error('Error parsing user answers:', error);

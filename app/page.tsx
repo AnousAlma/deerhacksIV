@@ -1,7 +1,7 @@
 "use client";
 import { Filter } from "lucide-react";
 import fetchData, { getFeaturedImages } from "./lib/events";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import Select from "react-select";
 import Pagination from "./components/Pagination";
 import Post from "./components/Post";
@@ -21,6 +21,7 @@ export default function EventsPage() {
   const [dateFilter, setDateFilter] = useState(""); // e.g. "2025-02-01"
 
   const featuredImages = getFeaturedImages();
+
 
   // Placeholder tags – adjust with your actual 50+ tags as needed.
   const availableTags = [
@@ -94,6 +95,17 @@ export default function EventsPage() {
     setDateFilter(e.target.value);
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    const userTags = localStorage.getItem('userTags');
+    if (!userTags) {
+      alert('Please complete the survey first!');
+    }
+    else {
+      alert('User tags loaded!');
+    }
+  }
+  , []);
 
   return (
     <div style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
