@@ -31,14 +31,11 @@ export async function POST(req: Request) {
     // authorize using api key or session
     const apiKey = req.headers.get("x-api-key");
 
-    console.log("API KEY", apiKey, "dog", apiKey === "dog", apiKey !== null && apiKey !== "dog");
-
     // api key exists and is not correct, or api key does not exist and session is not provided
-    if (apiKey !== null && apiKey !== "dog") {
+    if (apiKey !== null && apiKey !== process.env.API_KEY) {
         return NextResponse.json({ error: "Unauthorized: Invalid API key" }, { status: 401 });
     }
     else if (apiKey === null) {
-        console.log("USING SESSION")
         const session = await getServerSession(authOptions);
 
         if (!session) {
@@ -49,14 +46,17 @@ export async function POST(req: Request) {
 
 
     try {
-        const { title, description, startDate, endDate, location } = await req.json();
+        const result = await req.json();
+        const { title, description, startDate, endDate, location, ownerId } = result;
+
+        const data = { title, description, startDate, endDate, location, ownerId };
+        console.log("on the server, recieved package ", data);
 
         if (!title || !description || !startDate || !location) {
-            return NextResponse.json({ error: "title, description, startDate, endDate and location are required" }, { status: 400 });
+            return NextResponse.json({ error: "title, description, startDate and location are required" }, { status: 400 });
         }
-        console.log({ title, description, startDate, location })
-        const newPost = await EventPost.create({ title, description, startDate, endDate, location });
-        console.log("NEW POST", newPost)
+        const newPost = await EventPost.create(data);
+
         return NextResponse.json({ message: "Post created", post: newPost }, { status: 201 });
 
     } catch (error) {

@@ -8,9 +8,10 @@ interface EventPostAttributes {
     location: string;
     startDate: Date;
     endDate: Date;
+    ownerId?: string;
     createdAt?: Date;
 }
-export interface EventPostInput extends Optional<EventPostAttributes, 'id' | 'createdAt'> { }
+export interface EventPostInput extends Optional<EventPostAttributes, 'id' | 'createdAt' | 'ownerId'> { }
 export interface EventPostOutput extends Required<EventPostAttributes> { }
 
 export class EventPost extends Model<EventPostAttributes, EventPostInput> implements EventPostAttributes {
@@ -20,6 +21,7 @@ export class EventPost extends Model<EventPostAttributes, EventPostInput> implem
     public location!: string
     public startDate!: Date;
     public endDate!: Date;
+    public ownerId!: string;
 
     public readonly createdAt!: Date;
 }
@@ -51,6 +53,10 @@ EventPost.init(
         location: {
             type: DataTypes.STRING,
             allowNull: false,
+        },
+        ownerId: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
     },
     {
