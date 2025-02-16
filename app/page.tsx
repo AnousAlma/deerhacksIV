@@ -206,7 +206,6 @@ export default function EventsPage() {
                 className="relative transform transition-all duration-300 hover:scale-[1.02]"
             >
                 {/* Gradient overlay for text */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/60 to-blue-900/90 rounded-xl dark:via-blue-800/60 dark:to-blue-800/90" />
                 <Post {...event} />
             </motion.div>
         ))}
