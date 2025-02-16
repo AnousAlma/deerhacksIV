@@ -1,12 +1,16 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Post from "@/components/Post";
-import { Filter, Plus, Layout } from "lucide-react";
+import { Filter, Plus, Layout, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { Card, CardContent } from "@mui/material"
+import { Card, CardContent, Box, Typography } from "@mui/material";
+import { motion, AnimatePresence } from "framer-motion";
+import TagSelect from "@/components/TagSelect";
+import SortSelect from "@/components/SortSelect";
+import DateSelect from "@/components/DateSelect";
 
 const DashboardPage = () => {
   const router = useRouter();
@@ -15,6 +19,12 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reload, setReload] = useState(0);
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [sortBy, setSortBy] = useState('newest');
+  const [minimumDate, setMinimumDate] = useState("");
+
+  const refreshPosts = () => {};
 
   useEffect(() => {
     if (!session || !session.user) {
@@ -34,9 +44,33 @@ const DashboardPage = () => {
         const response = await fetch("/api/all_event_posts");
         if (!response.ok) throw new Error("Network response was not ok");
         const result = await response.json();
-        const data = result['data'];
-        const userEvents = data.filter((event) => event.ownerId === session.user?.email);
-        setEvents(userEvents);
+        let data = result['data'];
+        
+        // Filter for user's posts
+        data = data.filter((event) => event.ownerId === session.user?.email);
+        
+        // Apply date filter
+        if (minimumDate !== "") {
+          data = data.filter((event) => {
+            return new Date(event.startDate) >= new Date(minimumDate);
+          });
+        }
+
+        // Apply sorting
+        if (sortBy === "newest") {
+          data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        } else if (sortBy === "alphabetical") {
+          data.sort((a, b) => a.title.localeCompare(b.title));
+        }
+
+        // Apply tag filtering
+        if (selectedTags.length > 0) {
+          data = data.filter((event) => {
+            return selectedTags.some((tag) => event.tags.split(',').includes(tag));
+          });
+        }
+
+        setEvents(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An unknown error occurred");
       } finally {
@@ -45,15 +79,12 @@ const DashboardPage = () => {
     };
 
     fetchData();
-  }, [reload, session, router]);
+  }, [reload, session, router, selectedTags, sortBy, minimumDate]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 w-32 bg-gray-200 rounded"></div>
-          <div className="h-4 w-24 bg-gray-200 rounded"></div>
-        </div>
+      <div className="flex justify-center items-center h-screen bg-background">
+        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -61,74 +92,151 @@ const DashboardPage = () => {
   if (!session) return <p>loading</p>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Hero Section */}
-      <div className="relative h-64 mb-8 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-90"></div>
-        <div className="absolute inset-0 bg-[url('/images/mock_banner.png')] bg-cover bg-center mix-blend-overlay"></div>
-        <div className="relative z-10 h-full flex flex-col justify-end p-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Welcome back, {session.user?.name}
-          </h1>
-          <p className="text-gray-200">Manage your events and posts</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background">
+      {/* Banner */}
+      <Box
+        sx={{
+          width: "100%",
+          height: "40vh",
+          position: "relative",
+          marginBottom: "20px",
+          justifyContent: "start",
+          alignItems: "end",
+          background: theme =>
+            `linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(31, 41, 55, 0.31) 0%, 
+            ${theme.palette.background.default} 40%)`,
+        }}
+      >
+        <Typography
+          variant="h3"
+          sx={{
+            position: "absolute",
+            bottom: "24px",
+            left: "64px",
+            zIndex: 2,
+            color: "text.primary",
+            fontWeight: 800,
+            letterSpacing: "-0.5px",
+            textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          }}
+        >
+          Welcome back, {session.user?.name}!
+        </Typography>
+        <img
+          src="/images/mock_banner.png"
+          alt="Banner"
+          style={{
+            position: "absolute",
+            width: "auto",
+            height: "100%",
+            objectFit: "cover",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 1,
+          }}
+        />
+      </Box>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-0 shadow-lg">
-          <CardContent className="p-6">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-4">
-                <Layout className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">
-                  My Posts
-                </h2>
-              </div>
-              <div className="flex items-center gap-3">
-                <Link href="/dashboard/create">
-                  <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    <Plus className="w-5 h-5 mr-2" />
-                    New Post
-                  </button>
-                </Link>
-                <button className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  <Filter className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                </button>
-              </div>
-            </div>
+      <div className="px-4 md:px-[16px] py-8 max-w-7xl mx-auto">
+        {/* Title Section */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-purple-400 dark:text-purple-600" />
+            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 dark:from-blue-600 dark:to-purple-700">
+              My Posts
+            </h2>
+          </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-lg">
-                <p className="text-red-600 dark:text-red-400">{error}</p>
-              </div>
-            )}
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard/create">
+              <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <Plus className="w-5 h-5 mr-2" />
+                New Post
+              </button>
+            </Link>
+            <button
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 border border-white/20 dark:bg-gray-800/50 dark:hover:bg-gray-800/70"
+              onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+            >
+              <Filter className="w-4 h-4" />
+              <span>Filters</span>
+            </button>
+          </div>
+        </div>
 
-            {/* Posts Grid */}
-            {events.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {events.map((event) => (
-                  <div key={event.id} className="transform hover:scale-102 transition-transform duration-200">
-                    <Post {...event} isDashboard setReload={setReload} />
-                  </div>
-                ))}
+        {/* Filter Panel */}
+        <AnimatePresence>
+          {isFilterExpanded && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="backdrop-blur-md bg-white/5 p-6 mb-8 rounded-xl border border-white/10 shadow-lg dark:bg-gray-800/50 dark:border-gray-700/50">
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                  <TagSelect
+                    selectedTags={selectedTags}
+                    setSelectedTags={setSelectedTags}
+                    refreshPosts={refreshPosts}
+                  />
+                  <SortSelect
+                    sortBy={sortBy}
+                    setSortBy={setSortBy}
+                    refreshPosts={refreshPosts}
+                  />
+                  <DateSelect
+                    minimumDate={minimumDate}
+                    setMinimumDate={setMinimumDate}
+                    refreshPosts={refreshPosts}
+                  />
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <h3 className="text-xl text-gray-600 dark:text-gray-400">
-                  No posts yet. Ready to create your first one?
-                </h3>
-                <Link href="/dashboard/create">
-                  <button className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Create Post
-                  </button>
-                </Link>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
+        {/* Posts Grid */}
+        {events.length > 0 ? (
+          <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {events.map((event, index) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+                transition={{
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 20,
+                  delay: index * 0.05,
+                }}
+                className="relative transform transition-all duration-300 hover:scale-[1.02]"
+              >
+                <Post {...event} isDashboard setReload={setReload} />
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <div className="text-center py-12">
+            <h3 className="text-xl text-gray-600 dark:text-gray-400">
+              No posts yet. Ready to create your first one?
+            </h3>
+            <Link href="/dashboard/create">
+              <button className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Create Post
+              </button>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
