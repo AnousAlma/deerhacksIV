@@ -168,63 +168,35 @@ export default function EventsPage() {
                     </button>
                 </div>
 
-                {/* Filter Panel */}
-                <AnimatePresence>
-                    {isFilterExpanded && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="overflow-hidden"
-                        >
-                            <div className="backdrop-blur-md bg-white/5 p-6 mb-8 rounded-xl border border-white/10 shadow-lg dark:bg-gray-800/50 dark:border-gray-700/50">
-                                <div className="flex flex-col md:flex-row md:items-center gap-4">
-                                    <TagSelect
-                                        selectedTags={selectedTags}
-                                        setSelectedTags={setSelectedTags}
-                                        refreshPosts={refreshPosts}
-                                    />
-                                    <SortSelect
-                                        sortBy={sortBy}
-                                        setSortBy={setSortBy}
-                                        refreshPosts={refreshPosts}
-                                    />
-                                    <DateSelect
-                                        minimumDate={minimumDate}
-                                        setMinimumDate={setMinimumDate}
-                                        refreshPosts={refreshPosts}
-                                    />
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+            </motion.div>
+        )}
+    </AnimatePresence>
 
-                {/* Posts Grid */}
-                <motion.div
-                    className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                >
-                    {events.map((event, index) => (
-                        <motion.div
-                            key={event.id}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 100,
-                                damping: 20,
-                                delay: index * 0.05,
-                            }}
-                            className="relative transform transition-all duration-300 hover:scale-[1.02]"
-                        >
-                            {/* Gradient overlay for text */}
-                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/60 to-blue-900/90 rounded-xl dark:via-blue-800/60 dark:to-blue-800/90" />
-                            <Post {...event} />
-                        </motion.div>
-                    ))}
-                </motion.div>
-            </div>
+    {/* Posts Grid */}
+    <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+    >
+        {events.map((event, index) => (
+            <motion.div
+                key={event.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+                transition={{ 
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 20,
+                    delay: index * 0.05,
+                }}
+                className="relative transform transition-all duration-300 hover:scale-[1.02]"
+            >
+                {/* Gradient overlay for text */}
+                <Post {...event} />
+            </motion.div>
+        ))}
+    </motion.div>
+</div>
+
             {/* Modal */}
             <AnimatePresence>
                 {isModalOpen && (

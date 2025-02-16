@@ -27,7 +27,7 @@ export default function TagSelect({ selectedTags, setSelectedTags, refreshPosts 
     };
 
     return (
-        <div className="flex flex-col w-full md:w-1/3">
+        <div className="flex flex-col w-full md:w-1/3 relative" style={{ zIndex: 9999 }}>
             <label htmlFor="tagFilter" className="mb-1 text-foreground">Tags</label>
 
             <Select
@@ -38,38 +38,74 @@ export default function TagSelect({ selectedTags, setSelectedTags, refreshPosts 
                 value={tagOptions.filter(option => selectedTags.includes(option.value))}
                 onChange={handleTagSelectChange}
                 placeholder="Select tags..."
+                menuPortalTarget={document.body}
+                classNames={{
+                    control: () => "!min-h-10 border border-input bg-background hover:bg-accent",
+                    menu: () => "bg-background border border-input",
+                    menuList: () => "bg-background",
+                    multiValue: () => "bg-accent",
+                    multiValueLabel: () => "text-foreground",
+                    multiValueRemove: () => "text-foreground hover:bg-destructive hover:text-destructive-foreground",
+                    option: () => "hover:bg-accent hover:text-accent-foreground",
+                    placeholder: () => "text-muted-foreground",
+                }}
                 styles={{
                     control: (base) => ({
                         ...base,
                         backgroundColor: 'var(--background)',
                         color: 'var(--foreground)',
-                        minHeight: '40px',
-                        height: '40px',
-                        borderRadius: '0.375rem',
-                        border: '1px solid var(--foreground)',
+                        borderColor: 'var(--input)',
+                        boxShadow: 'none',
+                        '&:hover': {
+                            borderColor: 'var(--input)',
+                        },
                     }),
                     input: (base) => ({
                         ...base,
-                        color: 'var(--foreground)', // Ensures typed text matches the theme
+                        color: 'var(--foreground)',
                     }),
-                    singleValue: (base) => ({
+                    menuPortal: (base) => ({
                         ...base,
-                        color: 'var(--foreground)'
+                        zIndex: 9999,
                     }),
                     menu: (base) => ({
                         ...base,
                         backgroundColor: 'var(--background)',
-                        color: 'var(--foreground)'
+                        zIndex: 9999,
                     }),
-                    option: (base) => ({
+                    menuList: (base) => ({
                         ...base,
-                        backgroundColor: 'var(--background)',
+                        padding: 0,
+                    }),
+                    option: (base, state) => ({
+                        ...base,
+                        backgroundColor: state.isFocused ? 'var(--accent)' : 'var(--background)',
+                        color: state.isFocused ? 'var(--accent-foreground)' : 'var(--foreground)',
+                        cursor: 'pointer',
+                        '&:active': {
+                            backgroundColor: 'var(--accent)',
+                        },
+                    }),
+                    multiValue: (base) => ({
+                        ...base,
+                        backgroundColor: 'var(--accent)',
+                    }),
+                    multiValueLabel: (base) => ({
+                        ...base,
+                        color: 'var(--foreground)',
+                    }),
+                    multiValueRemove: (base) => ({
+                        ...base,
                         color: 'var(--foreground)',
                         '&:hover': {
-                            backgroundColor: 'var(--foreground)',
-                            color: 'var(--background)'
-                        }
-                    })
+                            backgroundColor: 'var(--destructive)',
+                            color: 'var(--destructive-foreground)',
+                        },
+                    }),
+                    valueContainer: (base) => ({
+                        ...base,
+                        padding: '0 8px',
+                    }),
                 }}
             />
         </div>
