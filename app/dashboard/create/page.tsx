@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { parseEventDetails } from "@/lib/utils/eventToTags";
-import { uploadToImgur } from "@/lib/utils/imgurUpload";
+import { uploadToCloudinary } from "@/lib/utils/cloudinaryUpload";
 
 
 export default function CreateEventPage() {
@@ -32,34 +32,56 @@ export default function CreateEventPage() {
     const [previewURL, setPreviewURL] = useState<string>("");
 
     const [error, setError] = useState("");
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
+    
         if (!session || !session.user) {
             setError("Access denied!");
             return;
         }
-       
-        // TODO: upload image file 
+    
         try {
-            const ownerId = session.user.email;        
-
-            const datetime = startDate.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
-            // const eventTags = await parseEventDetails(title, description, location, datetime);
+            let cloudinaryLink = null;
+    
+            // Upload image to Cloudinary if there's an image file
+            if (imageFile) {
+                cloudinaryLink = await uploadToCloudinary(imageFile); // Use the Cloudinary function
+                if (!cloudinaryLink) {
+                    setError("Failed to upload image to Cloudinary");
+                    return;
+                }
+            }
+    
+            const ownerId = session.user.email;
+            const datetime = startDate.toLocaleString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true,
+            });
+    
+            console.log(cloudinaryLink); // Log the Cloudinary link for debugging
+    
             const data = {
                 title,
                 description,
                 startDate,
                 endDate,
                 location,
-                ownerId
-            }
-
+                ownerId,
+                // imageUrl: cloudinaryLink, // Add the Cloudinary image link to your data
+            };
+    
             const response = await fetch("/api/event_post/", {
                 method: "POST",
-                body: JSON.stringify(data)
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
             });
+    
             if (!response.ok) {
                 setError("Failed with HTTP status code: " + response.status);
                 return;
@@ -67,27 +89,20 @@ export default function CreateEventPage() {
                 router.push("/dashboard");
             }
         } catch (error) {
-            console.error('Error parsing user answers:', error);
+            console.error('Error submitting form:', error);
             setError(`Error creating event: ${error}`);
         }
     };
+    
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setImageFile(file);
-
             const reader = new FileReader();
             reader.onload = async (event) => {
                 if (event.target?.result) {
                     setPreviewURL(event.target.result as string);
-
-                    const imgurLink = await uploadToImgur(file);
-                    if (imgurLink) {
-                        console.log("Uploaded to Imgur:", imgurLink);
-                    } else {
-                        console.error("Error uploading to Imgur");
-                    }
                 }
             };
         };
