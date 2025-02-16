@@ -3,8 +3,9 @@ const nextConfig = {
   images: {
     domains: [
       "images-ext-1.discordapp.net",
-      // add other allowed domains here
+      "res.cloudinary.com"
     ],
+    
   },
 };
 

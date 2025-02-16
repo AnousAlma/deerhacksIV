@@ -151,7 +151,7 @@ export default function Post({ id, title, description, startDate, endDate, locat
             {/* Modal */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <div className="relative w-full aspect-[4/3]">
-                    <Image src={img_src || "/images/placeholder.png"} alt="Event Image" fill className="object-cover" />
+                    <Image src={previewUrl || "/images/placeholder.png"} alt="Event Image" fill className="object-cover" />
                 </div>
                 <div className="p-6 text-white">
                     <h2 className="text-2xl font-semibold mb-2">{title}</h2>

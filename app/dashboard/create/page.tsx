@@ -30,13 +30,18 @@ export default function CreateEventPage() {
         startDate: new Date(),
         endDate: new Date(),
         discordLink: "",
-        instagramLink: "",
-        previewURL: "",
+        instagramLink: ""
     });
 
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [previewURL, setPreviewURL] = useState<string>("");
     const [error, setError] = useState("");
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,28 +64,16 @@ export default function CreateEventPage() {
                 }
             }
     
-            const ownerId = session.user.email;
-            const datetime = startDate.toLocaleString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true,
-            });
+
     
             console.log(cloudinaryLink); // Log the Cloudinary link for debugging
             const tags = await parseEventDetails(formData.title, formData.description, formData.location, formData.startDate.toISOString());
 
             const data = {
-                title,
-                description,
-                startDate,
-                endDate,
-                location,
-                ownerId,
+                ...formData,
                 tags,
-                // imageUrl: cloudinaryLink, // Add the Cloudinary image link to your data
+                ownerId: session.user.email,
+                previewUrl: cloudinaryLink, 
             };
     
             const response = await fetch("/api/event_post/", {
