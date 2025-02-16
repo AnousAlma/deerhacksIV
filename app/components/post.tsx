@@ -20,7 +20,7 @@ interface PostProps {
     isDashboard?: boolean;
     tags?: string;
     setReload?: (value: React.SetStateAction<number>) => void;
-    tags?: string[];
+    previewUrl?: string;
 }
 
 const dateFormat = new Intl.DateTimeFormat("en-US", {
@@ -48,7 +48,7 @@ const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => 
     );
 };
 
-export default function Post({ id, title, description, startDate, endDate, location, img_src, isDashboard, setReload, instagramUrl, discordUrl, tags=[] }: PostProps) {
+export default function Post({ id, title, description, startDate, endDate, location, img_src, isDashboard, setReload, instagramUrl, discordUrl, tags='', previewUrl }: PostProps) {
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { data: session, status } = useSession();
@@ -94,7 +94,7 @@ export default function Post({ id, title, description, startDate, endDate, locat
         <>
             <div onClick={handleCardClick} className="flex bg-[#37475F] text-white rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-200 hover:scale-[1.01] cursor-pointer h-64">
                 <div className="w-56 md:w-72 flex-shrink-0 relative">
-                    <Image src={img_src || "/images/placeholder.png"} alt="Event Image" fill className="object-cover" />
+                    <Image src={previewUrl || "/images/placeholder.png"} alt="Event Image" fill className="object-cover" />
                 </div>
                 <div className="flex-1 p-6 pr-10 relative flex flex-col">
                     <div className="flex-grow">
@@ -114,7 +114,7 @@ export default function Post({ id, title, description, startDate, endDate, locat
 
                     {/* Tags Section */}
                     <div className="flex flex-wrap gap-2 mt-auto">
-                        {displayTags.map((tag, index) => (
+                        {tags.split(",").map((tag, index) => (
                             <span 
                                 key={index} 
                                 className="px-2 py-1 bg-[#2A3B50] text-xs rounded-full text-gray-300"
@@ -173,7 +173,7 @@ export default function Post({ id, title, description, startDate, endDate, locat
 
                     {/* All Tags in Modal */}
                     <div className="flex flex-wrap gap-2">
-                        {tags.map((tag, index) => (
+                        {tags.split(",").map((tag, index) => (
                             <span 
                                 key={index} 
                                 className="px-2 py-1 bg-[#2A3B50] text-xs rounded-full text-gray-300"
