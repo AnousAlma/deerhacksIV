@@ -5,17 +5,18 @@ import ThemeToggle from "./ThemeToggle";
 import { signOut } from "next-auth/react"
 import { useSession } from "next-auth/react"
 
+import logo from "../../public/images/logo-white (2).png"
 export default function Header() {
     const { data: session, status } = useSession()
 
     return (
         <header>
             <nav className="flex flex-wrap items-center justify-between px-6 shadow"
-            style={{ backgroundColor: '#1f2937' }}>
+            style={{ backgroundColor: '#000' }}>
                 <Link href="/">
                     <div className="flex items-center gap-2">
                         <img
-                            src="/images/logo.png"
+                            src="/images/logo-white (2).png"
                             alt="UofT Crest"
                             className="w-16 h-16"
                         />
@@ -23,9 +24,6 @@ export default function Header() {
                     </div>
                 </Link>
                 <div className="flex items-center gap-4">
-                <Link href="/preference" className="hover:underline text-white">
-                        Preference
-                    </Link>
                     { session ? (
                     <Link href="/dashboard" className="hover:underline text-white">
                         Dashboard
