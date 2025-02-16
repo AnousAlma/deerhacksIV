@@ -1,4 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
 
 type Tag = string;
 type TagsResponse = Tag[];
@@ -21,11 +23,10 @@ async function parseUserAnswers(
   socialActivity: string,
   superpower: string
 ): Promise<TagsResponse> {
-  const apiKey = process.env.OPENAI_API_KEY || 'YOUR_OPENAI_API_KEY';
-  if (apiKey === 'YOUR_OPENAI_API_KEY') {
-    throw new Error('Please provide your OpenAI API key');
-  }
-
+  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY ?? 'NO_API_KEY_RECIEVED';
+  // if (apiKey === 'YOUR_OPENAI_API_KEY') {
+  //   throw new Error('Please provide your OpenAI API key you provided: ' + process.env.OPENAI_API_KEY );
+  // }
   const prompt = `We asked a user the following questions and they gave us the following answers to the questions:
       What year of study are you in?
       ${studentYear}
@@ -80,7 +81,8 @@ async function parseUserAnswers(
     const axiosError = error as AxiosError;
     console.error(
       'Error fetching data from OpenAI API:',
-      axiosError.response ? axiosError.response.data : axiosError.message
+      axiosError.response ? axiosError.response.data : axiosError.message,
+      apiKey
     );
     throw error;
   }

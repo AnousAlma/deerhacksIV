@@ -1,4 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
 
 type Tag = string;
 type TagsResponse = Tag[];
@@ -19,9 +21,9 @@ async function parseEventDetails(
   date: string,
   time: string
 ): Promise<TagsResponse> {
-  const apiKey = process.env.OPENAI_API_KEY || 'YOUR_OPENAI_API_KEY';
+  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY ?? 'YOUR_OPENAI_API_KEY';
   if (apiKey === 'YOUR_OPENAI_API_KEY') {
-    throw new Error('Please provide your OpenAI API key');
+    throw new Error('Please provide your OpenAI API key you provided: ' + apiKey);
   }
 
   const prompt = `You have the following data about an event happening:
