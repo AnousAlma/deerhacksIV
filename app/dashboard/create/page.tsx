@@ -5,14 +5,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaArrowLeft } from "react-icons/fa";
 
 export default function CreateEventPage() {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
+  const [startDateTime, setStartDateTime] = useState(""); // New: Start datetime
+  const [endDateTime, setEndDateTime] = useState(""); // New: End datetime
   const [location, setLocation] = useState("");
   const [tag, setTag] = useState("");
   const [error, setError] = useState("");
@@ -35,7 +35,6 @@ export default function CreateEventPage() {
       const file = e.target.files[0];
       setImageFile(file);
 
-      // Generate a preview URL using FileReader
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
@@ -49,12 +48,13 @@ export default function CreateEventPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // TODO: upload image file
+    // TODO: upload image file 
 
     console.log({
       title,
       description,
-      date,
+      startDateTime,
+      endDateTime,
       location,
       tag,
       imageFile,
@@ -67,15 +67,6 @@ export default function CreateEventPage() {
   return (
     <div className="min-h-screen text-white flex items-center justify-center">
       <div className="p-6 w-full max-w-lg">
-        {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="flex items-center text-[var(--foreground)] hover:underline mb-4"
-        >
-          <FaArrowLeft className="mr-1" />
-          Back
-        </button>
-
         <h1 className="text-3xl font-bold mb-6 text-center text-[var(--foreground)]">
           Create a New Event
         </h1>
@@ -108,16 +99,31 @@ export default function CreateEventPage() {
             />
           </div>
 
-          {/* Date */}
+          {/* Start Date and Time */}
           <div>
             <label className="block mb-2 text-lg font-medium text-[var(--foreground)]">
-              Date
+              Start Date and Time
             </label>
             <input
-              type="date"
+              type="datetime-local"
               className="w-full h-12 px-4 text-lg rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={startDateTime}
+              onChange={(e) => setStartDateTime(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* End Date and Time */}
+          <div>
+            <label className="block mb-2 text-lg font-medium text-[var(--foreground)]">
+              End Date and Time
+            </label>
+            <input
+              type="datetime-local"
+              className="w-full h-12 px-4 text-lg rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={endDateTime}
+              onChange={(e) => setEndDateTime(e.target.value)}
+              required
             />
           </div>
 
@@ -162,8 +168,6 @@ export default function CreateEventPage() {
               onChange={handleFileChange}
               className="text-white focus:outline-none"
             />
-
-            {/* Preview */}
             {previewURL && (
               <div className="mt-4">
                 <p className="text-sm text-gray-300 mb-2">Preview:</p>

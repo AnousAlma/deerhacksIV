@@ -46,10 +46,10 @@ export default function EventsPage() {
       return eventTags.some((tag) => lowerCaseSelected.includes(tag));
     })
     // Filter by date (only show events on or after the given date)
-    .filter((e) => {
-      if (!dateFilter) return true;
-      return e.date >= dateFilter;
-    });
+   .filter((e) => {
+  if (!dateFilter) return true;
+  return new Date(e.startDateTime) >= new Date(dateFilter);
+});
 
   // 2) Sort the filtered events
   const sortedEvents = [...filteredEvents].sort((a, b) => {
