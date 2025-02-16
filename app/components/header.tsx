@@ -23,6 +23,9 @@ export default function Header() {
                     </div>
                 </Link>
                 <div className="flex items-center gap-4">
+                <Link href="/preference" className="hover:underline text-white">
+                        Preference
+                    </Link>
                     { session ? (
                     <Link href="/dashboard" className="hover:underline text-white">
                         Dashboard

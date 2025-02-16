@@ -3,25 +3,30 @@ import { useState, useEffect, useCallback } from 'react';
 import { FiSun, FiMoon } from 'react-icons/fi';
 
 function persistItem(key: string, value: string) {
-    localStorage.setItem(key, value)
-    return value
+    if (typeof window !== "undefined") {
+        localStorage.setItem(key, value);
+    }
+    return value;
 }
 
 function usePersistentState(key: string, initialValue: string): [string, (newState: string) => string] {
-    const [state, setState] = useState(
-        () => localStorage.getItem(key) || persistItem(key, initialValue)
-    )
+    const [state, setState] = useState(() => {
+        if (typeof window !== "undefined") {
+            return localStorage.getItem(key) || persistItem(key, initialValue);
+        } else {
+            return initialValue;
+        }
+    });
 
     const setStateAndPersist = useCallback(
         (newState: string) => {
-            setState(newState)
-            return persistItem(key, newState)
+            setState(newState);
+            return persistItem(key, newState);
         },
         [key, setState]
-    )
-    return [state, setStateAndPersist]
+    );
+    return [state, setStateAndPersist];
 }
-
 
 export default function ThemeToggle() {
     const [theme, setTheme] = usePersistentState("theme", "light");

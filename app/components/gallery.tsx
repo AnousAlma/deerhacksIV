@@ -75,6 +75,8 @@ export default function Gallery({ images }: GalleryProps) {
                 onClick={prevSlide}
                 disabled={current === 0}
                 className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-[#2b3350] hover:bg-[#394063] px-3 py-1 rounded shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{color: "#fff"}}
+            
             >
                 {"<"}
             </button>
@@ -82,13 +84,12 @@ export default function Gallery({ images }: GalleryProps) {
                 onClick={nextSlide}
                 disabled={current === images.length - 1}
                 className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-[#2b3350] hover:bg-[#394063] px-3 py-1 rounded shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{color: "#fff"}}
             >
                 {">"}
             </button>
         </div>
     );
 }
-
-
 
 
