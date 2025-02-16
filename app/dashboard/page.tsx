@@ -108,7 +108,7 @@ const DashboardPage = () => {
 
             {/* Posts Grid */}
             {events.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">
                 {events.map((event) => (
                   <div key={event.id} className="transform hover:scale-102 transition-transform duration-200">
                     <Post {...event} isDashboard setReload={setReload} />
