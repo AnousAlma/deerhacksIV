@@ -12,7 +12,7 @@ export default function Header() {
     return (
         <header>
             <nav className="flex flex-wrap items-center justify-between px-6 shadow"
-            style={{ backgroundColor: '#000' }}>
+            style={{ backgroundColor: '#1F2937' }}>
                 <Link href="/">
                     <div className="flex items-center gap-2">
                         <img

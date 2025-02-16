@@ -31,7 +31,7 @@ export default function Gallery({ images }: GalleryProps) {
     if (!images || images.length === 0) return null;
 
     return (
-        <div className="relative w-full flex flex-col items-center py-6">
+        <div className="relative w-full flex flex-col items-center py-6 pt-24">
             <style jsx>{`
                 .slide-transition {
                     transition: transform 800ms cubic-bezier(0.34, 1.28, 0.64, 1), 
@@ -106,14 +106,14 @@ export default function Gallery({ images }: GalleryProps) {
             </div>
             <button
                 onClick={prevSlide}
-                className="absolute left-0 top-80 transform -translate-y-1/2 bg-[#2b3350] hover:bg-[#394063] px-3 py-1 rounded shadow-lg transition-all duration-500 hover:scale-110 slide-transition"
+                className="absolute left-16 top-80 transform -translate-y-1/2 bg-[#2b3350] hover:bg-[#394063] px-3 py-1 rounded shadow-lg transition-all duration-500 hover:scale-110 slide-transition"
                 style={{color: "#fff"}}
             >
                 {"<"}
             </button>
             <button
                 onClick={nextSlide}
-                className="absolute right-0 top-80 transform -translate-y-1/2 bg-[#2b3350] hover:bg-[#394063] px-3 py-1 rounded shadow-lg transition-all duration-500 hover:scale-110 slide-transition"
+                className="absolute right-16 top-80 transform -translate-y-1/2 bg-[#2b3350] hover:bg-[#394063] px-3 py-1 rounded shadow-lg transition-all duration-500 hover:scale-110 slide-transition"
                 style={{color: "#fff"}}
             >
                 {">"}
