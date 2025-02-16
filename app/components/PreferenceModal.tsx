@@ -1,5 +1,19 @@
 "use client";
 import React, { useState } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  TextField,
+  Typography,
+  Backdrop,
+} from "@mui/material";
+import parseUserAnswers from "@/api/parsers/userAnswersToTags";
 
 interface StudentSurveyModalProps {
   open: boolean;
@@ -22,6 +36,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+      
         try {
             const userTags = await parseUserAnswers(
                 formData.yearOfStudy,

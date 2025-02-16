@@ -21,6 +21,10 @@ const dateFormat = new Intl.DateTimeFormat("en-US", {
     year: "numeric",
 });
 
+const timeFormat = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "numeric",
+});
 
 // Modal Component
 const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode; }) => {
@@ -47,6 +51,7 @@ const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => 
 };
 
 export default function Post({
+    id,
     title,
     description,
     startDate,
@@ -57,105 +62,103 @@ export default function Post({
 }: PostProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Convert date strings to Date objects
-    const startDateObj = startDate ? new Date(startDate) : null;
-    const endDateObj = endDate ? new Date(endDate) : null;
 
-    const formattedStartDate = dateFormat.format(new Date(startDate));
-    const formattedEndDate = dateFormat.format(new Date(endDate));
+    // const formattedStartDate = dateFormat.format(new Date(startDate));
+    // const formattedEndDate = dateFormat.format(new Date(endDate));
+
     // Conditional formatting variables for card and modal displays
-    let dateDisplayCard;
-    let dateDisplayModal;
+    // let dateDisplayCard;
+    // let dateDisplayModal;
 
-    if (startDateObj && endDateObj) {
-        const sameDay =
-            startDateObj.getFullYear() === endDateObj.getFullYear() &&
-            startDateObj.getMonth() === endDateObj.getMonth() &&
-            startDateObj.getDate() === endDateObj.getDate();
+    // if (startDateObj && endDateObj) {
+    //     const sameDay =
+    //         startDateObj.getFullYear() === endDateObj.getFullYear() &&
+    //         startDateObj.getMonth() === endDateObj.getMonth() &&
+    //         startDateObj.getDate() === endDateObj.getDate();
 
-        if (sameDay) {
-            const datePart = new Intl.DateTimeFormat("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-            }).format(startDateObj);
-            const startTime = new Intl.DateTimeFormat("en-US", {
-                hour: "numeric",
-                minute: "numeric",
-            }).format(startDateObj);
-            const endTime = new Intl.DateTimeFormat("en-US", {
-                hour: "numeric",
-                minute: "numeric",
-            }).format(endDateObj);
+    //     if (sameDay) {
+    //         const datePart = new Intl.DateTimeFormat("en-US", {
+    //             month: "long",
+    //             day: "numeric",
+    //             year: "numeric",
+    //         }).format(startDateObj);
+    //         const startTime = new Intl.DateTimeFormat("en-US", {
+    //             hour: "numeric",
+    //             minute: "numeric",
+    //         }).format(startDateObj);
+    //         const endTime = new Intl.DateTimeFormat("en-US", {
+    //             hour: "numeric",
+    //             minute: "numeric",
+    //         }).format(endDateObj);
 
-            dateDisplayCard = (
-                <p className="text-sm text-gray-300 mb-2">
-                    {datePart} - {startTime} to {endTime}
-                </p>
-            );
-            dateDisplayModal = (
-                <div className="flex items-center gap-2">
-                    <FaClock className="text-gray-300 w-4 h-4" />
-                    <span className="text-gray-300">
-                        {datePart} - {startTime} to {endTime}
-                    </span>
-                </div>
-            );
-        } else {
-            const formattedStart = new Intl.DateTimeFormat("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-            }).format(startDateObj);
-            const formattedEnd = new Intl.DateTimeFormat("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-            }).format(endDateObj);
+    //         dateDisplayCard = (
+    //             <p className="text-sm text-gray-300 mb-2">
+    //                 {datePart} - {startTime} to {endTime}
+    //             </p>
+    //         );
+    //         dateDisplayModal = (
+    //             <div className="flex items-center gap-2">
+    //                 <FaClock className="text-gray-300 w-4 h-4" />
+    //                 <span className="text-gray-300">
+    //                     {datePart} - {startTime} to {endTime}
+    //                 </span>
+    //             </div>
+    //         );
+    //     } else {
+    //         const formattedStart = new Intl.DateTimeFormat("en-US", {
+    //             month: "long",
+    //             day: "numeric",
+    //             year: "numeric",
+    //             hour: "numeric",
+    //             minute: "numeric",
+    //         }).format(startDateObj);
+    //         const formattedEnd = new Intl.DateTimeFormat("en-US", {
+    //             month: "long",
+    //             day: "numeric",
+    //             year: "numeric",
+    //             hour: "numeric",
+    //             minute: "numeric",
+    //         }).format(endDateObj);
 
-            dateDisplayCard = (
-                <>
-                    <p className="text-sm text-gray-300 mb-2">Start: {formattedStart}</p>
-                    <p className="text-sm text-gray-300 mb-2">End: {formattedEnd}</p>
-                </>
-            );
-            dateDisplayModal = (
-                <>
-                    <div className="flex items-center gap-2">
-                        <FaClock className="text-gray-300 w-4 h-4" />
-                        <span className="text-gray-300">Start: {formattedStart}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <FaClock className="text-gray-300 w-4 h-4" />
-                        <span className="text-gray-300">End: {formattedEnd}</span>
-                    </div>
-                </>
-            );
-        }
-    } else {
-        dateDisplayCard = (
-            <>
-                <p className="text-sm text-gray-300 mb-2">Start date not set</p>
-                <p className="text-sm text-gray-300 mb-2">End date not set</p>
-            </>
-        );
-        dateDisplayModal = (
-            <>
-                <div className="flex items-center gap-2">
-                    <FaClock className="text-gray-300 w-4 h-4" />
-                    <span className="text-gray-300">Start date not set</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <FaClock className="text-gray-300 w-4 h-4" />
-                    <span className="text-gray-300">End date not set</span>
-                </div>
-            </>
-        );
-    }
+    //         dateDisplayCard = (
+    //             <>
+    //                 <p className="text-sm text-gray-300 mb-2">Start: {formattedStart}</p>
+    //                 <p className="text-sm text-gray-300 mb-2">End: {formattedEnd}</p>
+    //             </>
+    //         );
+    //         dateDisplayModal = (
+    //             <>
+    //                 <div className="flex items-center gap-2">
+    //                     <FaClock className="text-gray-300 w-4 h-4" />
+    //                     <span className="text-gray-300">Start: {formattedStart}</span>
+    //                 </div>
+    //                 <div className="flex items-center gap-2">
+    //                     <FaClock className="text-gray-300 w-4 h-4" />
+    //                     <span className="text-gray-300">End: {formattedEnd}</span>
+    //                 </div>
+    //             </>
+    //         );
+    //     }
+    // } else {
+    //     dateDisplayCard = (
+    //         <>
+    //             <p className="text-sm text-gray-300 mb-2">Start date not set</p>
+    //             <p className="text-sm text-gray-300 mb-2">End date not set</p>
+    //         </>
+    //     );
+    //     dateDisplayModal = (
+    //         <>
+    //             <div className="flex items-center gap-2">
+    //                 <FaClock className="text-gray-300 w-4 h-4" />
+    //                 <span className="text-gray-300">Start date not set</span>
+    //             </div>
+    //             <div className="flex items-center gap-2">
+    //                 <FaClock className="text-gray-300 w-4 h-4" />
+    //                 <span className="text-gray-300">End date not set</span>
+    //             </div>
+    //         </>
+    //     );
+    // }
 
     const handleCardClick = () => {
         setIsModalOpen(true);
@@ -165,6 +168,7 @@ export default function Post({
         e.stopPropagation(); // Prevent triggering the card click
         console.log("Delete post with ID:", id); // Add your delete logic here
     };
+
 
     return (
         <>
@@ -187,7 +191,7 @@ export default function Post({
 
                 <div className="flex-1 p-6 relative">
                     <h2 className="text-xl font-semibold mb-1">{title}</h2>
-                    {dateDisplayCard}
+                    {/* {dateDisplayCard} */}
                     <p className="text-gray-300 text-sm md:text-base mb-2 pr-4">
                         {description}
                     </p>
@@ -263,7 +267,7 @@ export default function Post({
                 <div className="p-6 text-white">
                     <h2 className="text-2xl font-semibold mb-2">{title}</h2>
                     <div className="flex flex-col gap-1 mb-4">
-                        {dateDisplayModal}
+                        {/* {dateDisplayModal} */}
                         {location && (
                             <div className="flex items-center gap-2">
                                 <FaMapMarkerAlt className="text-gray-300 w-4 h-4" />

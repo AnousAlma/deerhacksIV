@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import parseEventDetails from "@/api/parsers/eventToTags";
 
 import { create as createPost } from "@/lib/db/dal/post";
+import { uploadToImgur } from "@/api/parsers/imugrUpload";
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -32,15 +33,22 @@ export default function CreateEventPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string>("");
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImageFile(file);
 
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         if (event.target?.result) {
           setPreviewURL(event.target.result as string);
+
+          const imgurLink = await uploadToImgur(file);
+          if (imgurLink) {
+            console.log("Uploaded to Imgur:", imgurLink);
+          } else {
+            console.error("Error uploading to Imgur");
+          }
         }
       };
       reader.readAsDataURL(file);
