@@ -15,7 +15,7 @@ const POSTS_PER_PAGE = 8;
 
 export default function EventsPage() {
     // load events from the database
-    const [events, setEvents] = useState([]);
+    const [events, setEvents] = useState<EventPostOutput[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
