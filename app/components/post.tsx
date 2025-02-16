@@ -62,8 +62,10 @@ export default function Post({
 }: PostProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+
     // const formattedStartDate = dateFormat.format(new Date(startDate));
     // const formattedEndDate = dateFormat.format(new Date(endDate));
+
     // Conditional formatting variables for card and modal displays
     // let dateDisplayCard;
     // let dateDisplayModal;
