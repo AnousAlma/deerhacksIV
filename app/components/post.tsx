@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Router, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface PostProps {
     id: number;
@@ -14,7 +15,10 @@ interface PostProps {
     endDate: Date;
     location: string;
     img_src?: string;
+    instagramUrl?: string;
+    discordUrl?: string;
     isDashboard?: boolean;
+    tags?: string;
     setReload?: (value: React.SetStateAction<number>) => void;
 }
 
@@ -43,7 +47,7 @@ const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => 
     );
 };
 
-export default function Post({ id, title, description, startDate, endDate, location, img_src, isDashboard, setReload }: PostProps) {
+export default function Post({ id, title, description, startDate, endDate, location, img_src, isDashboard, setReload, instagramUrl, discordUrl, tags }: PostProps) {
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { data: session, status } = useSession();
@@ -84,9 +88,9 @@ export default function Post({ id, title, description, startDate, endDate, locat
     };
 
     return (
-        <>
-            <div onClick={handleCardClick} className="flex bg-[#2A3B50] text-white rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-200 hover:scale-[1.01] cursor-pointer">
-                <div className="w-56 md:w-72 flex-shrink-0 relative">
+        <div className="h-200">
+            <div onClick={handleCardClick} className="flex h-200 bg-[#2A3B50] text-white rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-200 hover:scale-[1.01] cursor-pointer">
+                <div className="w-56 h-56 md:w-72 flex-shrink-0 relative">
                     <Image src={img_src || "/images/placeholder.png"} alt="Event Image" fill className="object-cover" />
                 </div>
                 <div className="flex-1 p-6 pr-10 relative">
@@ -104,12 +108,14 @@ export default function Post({ id, title, description, startDate, endDate, locat
                     )}
 
                     <div className="absolute top-4 right-2 flex flex-col gap-2">
+                        { instagramUrl && (
                         <div className="p-2 bg-gray-700 rounded-md cursor-pointer transition-colors duration-200 hover:bg-white group">
-                            <FaInstagram className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-gray-700" />
-                        </div>
+                            <Link href="https://google.com"><FaInstagram className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-gray-700" /></Link>
+                        </div>)}
+                        { discordUrl && (
                         <div className="p-2 bg-gray-700 rounded-md cursor-pointer transition-colors duration-200 hover:bg-white group">
-                            <FaDiscord className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-gray-700" />
-                        </div>
+                            <Link href="https://google.com"><FaDiscord className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-gray-700" /></Link>
+                        </div>)}
 
                         {isDashboard && (
                             <div className="p-2 bg-red-600 rounded-md cursor-pointer transition-colors duration-200 hover:bg-red-500 group" onClick={handleDelete}>
@@ -144,6 +150,6 @@ export default function Post({ id, title, description, startDate, endDate, locat
                     <p className="text-gray-300 mb-6">{description}</p>
                 </div>
             </Modal>
-        </>
+        </div>
     );
 }

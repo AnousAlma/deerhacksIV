@@ -19,7 +19,7 @@ export default function EventsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [sortBy, setSortBy] = useState<'newest' | 'popularity'>("newest");
+    const [sortBy, setSortBy] = useState<'newest' | 'alphabetical'>("newest");
     const [minimumDate, setMinimumDate] = useState("");
     const [isModalOpen, setModalOpen] = useState(false);
     const [isFilterExpanded, setIsFilterExpanded] = useState(false);
@@ -34,15 +34,28 @@ export default function EventsPage() {
                 const response = await fetch("/api/all_event_posts");
                 if (!response.ok) throw new Error("Network response was not ok");
                 const result = await response.json();
-                
+
                 if (!('data' in result)) {
                     console.log("Failed to parse result", result);
                 }
 
-                const data = result['data'];
+                let data = result['data'];
                 if (!Array.isArray(data)) {
                     throw new Error("Expected an array but got something else");
                 }
+
+                if (minimumDate !== "") {
+                    data = data.filter((event) => {
+                        return new Date(event.startDate) >= new Date(minimumDate);
+                    });
+                }
+
+                if (sortBy === "newest") {
+                    data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                } else if (sortBy === "alphabetical") {
+                    data.sort((a, b) => a.title.localeCompare(b.title));
+                }
+
                 setEvents(data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : "An unknown error occurred");
@@ -52,7 +65,7 @@ export default function EventsPage() {
         };
 
         fetchData();
-    }, []);
+    }, [sortBy, selectedTags, minimumDate]);
 
     useEffect(() => {
         const userTags = localStorage.getItem('userTags');
@@ -85,7 +98,7 @@ export default function EventsPage() {
             <section className="relative pt-24 pb-16 overflow-hidden">
                 {/* Background Gradient */}
                 <div className="absolute inset-0 overflow-hidden">
-                    <div 
+                    <div
                         className="absolute inset-0 bg-gradient-radial from-blue-500/30 to-transparent dark:from-blue-500/10 dark:to-transparent"
                         style={{
                             transform: 'scale(1.8)',
@@ -93,7 +106,7 @@ export default function EventsPage() {
                             opacity: 0.6
                         }}
                     />
-                    <div 
+                    <div
                         className="absolute inset-0 bg-gradient-to-tr from-blue-400/20 via-transparent to-purple-500/20 dark:from-blue-400/10 dark:to-purple-500/10"
                         style={{
                             filter: 'blur(60px)',
@@ -128,19 +141,19 @@ export default function EventsPage() {
                 <Gallery images={[]} />
             </div>
 
-        {/* Main Content */}
-<div className="px-4 md:px-[16px] py-8 max-w-7xl mx-auto">
-    {/* Title Section */}
-    <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-purple-400 dark:text-purple-600" />
-            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 dark:from-blue-600 dark:to-purple-700">
-                Latest Posts
-            </h2>
-        </div>
-        
-        <button
-            className={`
+            {/* Main Content */}
+            <div className="px-4 md:px-[16px] py-8 max-w-7xl mx-auto">
+                {/* Title Section */}
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        <Sparkles className="w-6 h-6 text-purple-400 dark:text-purple-600" />
+                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 dark:from-blue-600 dark:to-purple-700">
+                            Latest Posts
+                        </h2>
+                    </div>
+
+                    <button
+                        className={`
                 flex items-center gap-2 
                 px-4 py-2 rounded-lg 
                 bg-white/10 backdrop-blur-md 
@@ -148,70 +161,70 @@ export default function EventsPage() {
                 border border-white/20
                 dark:bg-gray-800/50 dark:hover:bg-gray-800/70
             `}
-            onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-        >
-            <Filter className="w-4 h-4" />
-            <span>Filters</span>
-        </button>
-    </div>
-
-    {/* Filter Panel */}
-    <AnimatePresence>
-        {isFilterExpanded && (
-            <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-            >
-                <div className="backdrop-blur-md bg-white/5 p-6 mb-8 rounded-xl border border-white/10 shadow-lg dark:bg-gray-800/50 dark:border-gray-700/50">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        <TagSelect 
-                            selectedTags={selectedTags} 
-                            setSelectedTags={setSelectedTags} 
-                            refreshPosts={refreshPosts}
-                        />
-                        <SortSelect 
-                            sortBy={sortBy} 
-                            setSortBy={setSortBy} 
-                            refreshPosts={refreshPosts}
-                        />
-                        <DateSelect 
-                            minimumDate={minimumDate} 
-                            setMinimumDate={setMinimumDate} 
-                            refreshPosts={refreshPosts}
-                        />
-                    </div>
+                        onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                    >
+                        <Filter className="w-4 h-4" />
+                        <span>Filters</span>
+                    </button>
                 </div>
-            </motion.div>
-        )}
-    </AnimatePresence>
 
-    {/* Posts Grid */}
-    <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-    >
-        {events.map((event, index) => (
-            <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-                transition={{ 
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 20,
-                    delay: index * 0.05,
-                }}
-                className="relative transform transition-all duration-300 hover:scale-[1.02]"
-            >
-                {/* Gradient overlay for text */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/60 to-blue-900/90 rounded-xl dark:via-blue-800/60 dark:to-blue-800/90" />
-                <Post {...event} />
-            </motion.div>
-        ))}
-    </motion.div>
-</div>
+                {/* Filter Panel */}
+                <AnimatePresence>
+                    {isFilterExpanded && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="overflow-hidden"
+                        >
+                            <div className="backdrop-blur-md bg-white/5 p-6 mb-8 rounded-xl border border-white/10 shadow-lg dark:bg-gray-800/50 dark:border-gray-700/50">
+                                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                                    <TagSelect
+                                        selectedTags={selectedTags}
+                                        setSelectedTags={setSelectedTags}
+                                        refreshPosts={refreshPosts}
+                                    />
+                                    <SortSelect
+                                        sortBy={sortBy}
+                                        setSortBy={setSortBy}
+                                        refreshPosts={refreshPosts}
+                                    />
+                                    <DateSelect
+                                        minimumDate={minimumDate}
+                                        setMinimumDate={setMinimumDate}
+                                        refreshPosts={refreshPosts}
+                                    />
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Posts Grid */}
+                <motion.div
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                >
+                    {events.map((event, index) => (
+                        <motion.div
+                            key={event.id}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+                            transition={{
+                                type: "spring",
+                                stiffness: 100,
+                                damping: 20,
+                                delay: index * 0.05,
+                            }}
+                            className="relative transform transition-all duration-300 hover:scale-[1.02]"
+                        >
+                            {/* Gradient overlay for text */}
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/60 to-blue-900/90 rounded-xl dark:via-blue-800/60 dark:to-blue-800/90" />
+                            <Post {...event} />
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </div>
             {/* Modal */}
             <AnimatePresence>
                 {isModalOpen && (
