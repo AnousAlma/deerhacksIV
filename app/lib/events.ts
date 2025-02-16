@@ -59,7 +59,7 @@ export default function fetchData() {
 export function getFeaturedImages() {
     const events = fetchData();
     // Get the last 5
-    const featured = events.slice(-5);
+    const featured = events.slice(-4);
     // Return just the image paths
     return featured.map((event) => event.img_src);
 }

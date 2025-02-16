@@ -7,7 +7,7 @@ export interface Events {
     [eventName: string]: number[];
 }
 
-const TAGS: { [key: number]: string } = {
+export const TAGS: { [key: number]: string } = {
     0: "Academic",
     1: "Art",
     2: "Music",
@@ -60,7 +60,7 @@ const TAGS: { [key: number]: string } = {
     49: "Community"
 };
 
-function recommendEvents(userData: UserData, events: Events, topN: number = 5): string[] {
+export function recommendEvents(userData: UserData, events: Events, topN: number = 5): string[] {
     const tagWeights: { [tag: number]: number } = {};
 
     // Assign weights for preferences (double weight)
