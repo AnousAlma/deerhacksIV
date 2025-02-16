@@ -41,3 +41,10 @@ body {
     overflow-x: hidden;
     scroll-behavior: smooth;
 }
+
+
+
+/* Lucide icons */
+.lucide-icon {
+  color: rgb(var(--foreground));
+}
