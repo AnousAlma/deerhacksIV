@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { FaInstagram, FaDiscord, FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import { FaInstagram, FaDiscord, FaClock, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { X } from "lucide-react";
 
@@ -13,6 +13,7 @@ interface PostProps {
   location?: string;
   post_tag?: string;
   img_src?: string;
+  isDashboard?: boolean; // New prop for dashboard-specific features
 }
 
 // Modal Component
@@ -47,6 +48,7 @@ export default function Post({
   location,
   post_tag,
   img_src,
+  isDashboard, // New prop
 }: PostProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -152,6 +154,11 @@ export default function Post({
     setIsModalOpen(true);
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the card click
+    console.log("Delete post with ID:", id); // Add your delete logic here
+  };
+
   return (
     <>
       <div
@@ -213,6 +220,16 @@ export default function Post({
             <div className="p-2 bg-gray-700 rounded-md cursor-pointer transition-colors duration-200 hover:bg-white group">
               <FaDiscord className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-gray-700" />
             </div>
+
+            {/* Trash can icon (only for dashboard) */}
+            {isDashboard && (
+              <div
+                className="p-2 bg-red-600 rounded-md cursor-pointer transition-colors duration-200 hover:bg-red-500 group"
+                onClick={handleDelete}
+              >
+                <FaTrash className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-white" />
+              </div>
+            )}
           </div>
         </div>
       </div>
