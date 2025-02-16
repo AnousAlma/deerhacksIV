@@ -58,8 +58,8 @@ export default function Post({
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Convert date strings to Date objects
-    const startDateObj = startDateTime ? new Date(startDateTime) : null;
-    const endDateObj = endDateTime ? new Date(endDateTime) : null;
+    const startDateObj = startDate ? new Date(startDate) : null;
+    const endDateObj = endDate ? new Date(endDate) : null;
 
     const formattedStartDate = dateFormat.format(new Date(startDate));
     const formattedEndDate = dateFormat.format(new Date(endDate));
