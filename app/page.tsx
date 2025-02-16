@@ -6,13 +6,68 @@ import fetchData, { getFeaturedImages } from "@/lib/events";
 import Pagination from "@/components/Pagination";
 import Post from "@/components/Post";
 import Gallery from "@/components/Gallery";
-import { EventPostOutput } from "@/lib/db/models/post";
+import EventPost, { EventPostOutput } from "@/lib/db/models/post";
 import TagSelect from "./components/TagSelect";
 import SortSelect from "./components/SortSelect";
 import DateSelect from "./components/DateSelect";
 import StudentSurveyModal from "./components/PreferenceModal";
+import {recommendEvents} from "@/lib/algorithm/ForYouAlgorithm";
 
 const POSTS_PER_PAGE = 8;
+
+
+const TAGS: { [key: string]: number } = {
+    "academic": 0,
+    "art": 1,
+    "music": 2,
+    "dance": 3,
+    "theatre": 4,
+    "film": 5,
+    "poetry": 6,
+    "culture": 7,
+    "debate": 8,
+    "robotics": 9,
+    "coding": 10,
+    "hackathon": 11,
+    "engineering": 12,
+    "science": 13,
+    "math": 14,
+    "writing": 15,
+    "literature": 16,
+    "history": 17,
+    "philosophy": 18,
+    "politics": 19,
+    "environment": 20,
+    "sustainability": 21,
+    "volunteer": 22,
+    "charity": 23,
+    "networking": 24,
+    "career": 25,
+    "business": 26,
+    "entrepreneurship": 27,
+    "finance": 28,
+    "investment": 29,
+    "sports": 30,
+    "fitness": 31,
+    "yoga": 32,
+    "running": 33,
+    "soccer": 34,
+    "basketball": 35,
+    "tennis": 36,
+    "hiking": 37,
+    "gaming": 38,
+    "chess": 39,
+    "photography": 40,
+    "design": 41,
+    "fashion": 42,
+    "food": 43,
+    "cooking": 44,
+    "travel": 45,
+    "language": 46,
+    "meditation": 47,
+    "wellness": 48,
+    "community": 49
+};
 
 export default function EventsPage() {
     const [events, setEvents] = useState<EventPostOutput[]>([]);
@@ -23,6 +78,8 @@ export default function EventsPage() {
     const [minimumDate, setMinimumDate] = useState("");
     const [isModalOpen, setModalOpen] = useState(false);
     const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+
+    const [galleryImages, setGalleryImages] = useState<string[]>([]);
 
     const refreshPosts = () => {};
 
@@ -41,6 +98,31 @@ export default function EventsPage() {
                 if (!Array.isArray(data)) {
                     throw new Error("Expected an array but got something else");
                 }
+                
+
+                // const eventsMap = {};
+
+                // data.forEach((event) => {
+                //     eventsMap[event.title] = [];
+
+                //     event.tags.split(',').forEach(tag => {
+                //         eventsMap[event.title].push(TAGS[tag]);
+                //     });
+                // });
+                
+                // if (localStorage.getItem('userTags') !== null) {
+                //     const recommendedEventTitles = recommendEvents(localStorage.getItem('userTags'), eventsMap, 3);
+
+                //     const recommendedEventPaths = await Promise.all(
+                //         recommendedEventTitles.map(async (title) => {
+                //             const response = await fetch(`/api/get_title/${title}`);
+                //             if (!response.ok) throw new Error(`Failed to fetch event with title: ${title}`);
+                //             return await response.json();
+                //         })
+                //     );
+
+                //     setGalleryImages(recommendedEventPaths);
+                // }
 
                 if (minimumDate !== "") {
                     data = data.filter((event) => {
@@ -60,6 +142,7 @@ export default function EventsPage() {
                     });
                 }
 
+                
                 setEvents(data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : "An unknown error occurred");
@@ -142,7 +225,7 @@ export default function EventsPage() {
 
             {/* Featured Images Gallery */}
             <div className="w-full mb-16">
-                <Gallery images={[]} />
+                <Gallery images={getFeaturedImages()} />
             </div>
 
             {/* Main Content */}
