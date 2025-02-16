@@ -1,38 +1,26 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import dotenv from 'dotenv';
-dotenv.config();
 
 type Tag = string;
 type TagsResponse = Tag[];
 
-// Define the OpenAI API response structure
-interface OpenAIResponse {
-  choices: {
-    message: {
-      content: string;
-    };
-  }[];
-}
 
-async function parseEventDetails(
-  title: string,
-  description: string,
-  location: string,
-  date: string,
-  time: string
+export async function parseEventDetails(
+    title: string,
+    description: string,
+    location: string,
+    date: string
 ): Promise<TagsResponse> {
-  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY ?? 'YOUR_OPENAI_API_KEY';
-  if (apiKey === 'YOUR_OPENAI_API_KEY') {
-    throw new Error('Please provide your OpenAI API key you provided: ' + apiKey);
-  }
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+        throw new Error('Error, invalid apiKey passed.');
+    }
 
-  const prompt = `You have the following data about an event happening:
+    const prompt = `You have the following data about an event happening:
     {
       "title": ${JSON.stringify(title)},
       "description": ${JSON.stringify(description)},
       "location": ${JSON.stringify(location)},
-      "date": ${JSON.stringify(date)},
-      "time": ${JSON.stringify(time)}
+      "date": ${JSON.stringify(date)}
     }
   
   Your task:
@@ -47,35 +35,35 @@ async function parseEventDetails(
   Strictly adhere to this format and provide output only in JSON array format, never ever ever use tags that aren't from above, if you do not have enough information pick the closest tag or just output no tags.
   `;
 
-  try {
-    const response: AxiosResponse<OpenAIResponse> = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-4-turbo',
-        messages: [{ role: 'system', content: prompt }],
-        max_tokens: 500,
-        temperature: 0.0,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    try {
+        const response: AxiosResponse<OpenAIResponse> = await axios.post(
+            'https://api.openai.com/v1/chat/completions',
+            {
+                model: 'gpt-4-turbo',
+                messages: [{ role: 'system', content: prompt }],
+                max_tokens: 500,
+                temperature: 0.0,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
 
-    const completion = response.data.choices[0].message.content.trim();
-    const eventDetails: TagsResponse = JSON.parse(completion);
+        const completion = response.data.choices[0].message.content.trim();
+        const eventDetails: TagsResponse = JSON.parse(completion);
 
-    return eventDetails;
-  } catch (error) {
-    const axiosError = error as AxiosError;
-    console.error(
-      'Error fetching data from OpenAI API:',
-      axiosError.response ? axiosError.response.data : axiosError.message
-    );
-    throw error;
-  }
+        return eventDetails;
+    } catch (error) {
+        const axiosError = error as AxiosError;
+        console.error(
+            'Error fetching data from OpenAI API:',
+            axiosError.response ? axiosError.response.data : axiosError.message
+        );
+        throw error;
+    }
 }
 
 // // Usage example
@@ -88,5 +76,3 @@ async function parseEventDetails(
 // )
 //   .then((data) => console.log(data))
 //   .catch((err) => console.error(err));
-
-export default parseEventDetails;
