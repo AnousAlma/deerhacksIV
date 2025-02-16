@@ -67,7 +67,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
         >
             <DialogTitle>
             <Typography variant="h5" align="center">
-                Lets get to know you better! 😊🌟
+                Let's get to know you better! 😊🌟
             </Typography>
             </DialogTitle>
             <DialogContent dividers style={{ maxHeight: "80vh" }}>
