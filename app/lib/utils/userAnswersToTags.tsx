@@ -3,36 +3,47 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 type Tag = string;
 type TagsResponse = Tag[];
 
-
-export async function parseEventDetails(
-    title: string,
+export async function parseUserAnswers(
+    studentYear: string,
+    studentMajor: string,
+    hobies: string,
+    freeTime: string,
     description: string,
-    location: string,
-    date: string
+    socialActivity: string,
+    superpower: string
 ): Promise<TagsResponse> {
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
     if (!apiKey) {
-        throw new Error('Error, invalid apiKey passed.');
+        throw new Error('Error, invalid OpenAI key passed.');
     }
 
-    const prompt = `You have the following data about an event happening:
-    {
-      "title": ${JSON.stringify(title)},
-      "description": ${JSON.stringify(description)},
-      "location": ${JSON.stringify(location)},
-      "date": ${JSON.stringify(date)}
-    }
+    const prompt = `We asked a user the following questions and they gave us the following answers to the questions:
+      What year of study are you in?
+      ${studentYear}
+      What's your major or area of study?
+      ${studentMajor}
+      What are your hobbies? (Write up to 10 words)
+      ${hobies}
+      What's your favorite way to spend free time?
+      ${freeTime}
+      How would your friends describe you?
+      ${description}
+      What's your go-to social activity?
+      ${socialActivity}
+      If you could have a superpower, what would it be?
+      ${superpower}
+
   
   Your task:
-  Pick 0 to 5 tags from the following list that you feel like best describe the event. Then return a list of the tags in the output format below.
+  Pick 5 to 7 tags from the following list that you feel like the user would be interested in based on their answers.
   
   Tags:
   ["Academic", "Art", "Music", "Dance", "Theatre", "Film", "Poetry", "Culture", "Debate", "Robotics", "Coding", "Hackathon", "Engineering", "Science", "Math", "Writing", "Literature", "History", "Philosophy", "Politics", "Environment", "Sustainability", "Volunteer", "Charity", "Networking", "Career", "Business", "Entrepreneurship", "Finance", "Investment", "Sports", "Fitness", "Yoga", "Running", "Soccer", "Basketball", "Tennis", "Hiking", "Gaming", "Chess", "Photography", "Design", "Fashion", "Food", "Cooking", "Travel", "Language", "Meditation", "Wellness", "Community"]
   
   Output Format:
-  [<tag1>, <tag2>, <tag3>... and so on up to 5 tags]
+  [<tag1>, <tag2>, <tag3>... and so on up to 7 tags]
   
-  Strictly adhere to this format and provide output only in JSON array format, never ever ever use tags that aren't from above, if you do not have enough information pick the closest tag or just output no tags.
+  Strictly adhere to this format and provide output only in JSON array format.
   `;
 
     try {
@@ -60,19 +71,9 @@ export async function parseEventDetails(
         const axiosError = error as AxiosError;
         console.error(
             'Error fetching data from OpenAI API:',
-            axiosError.response ? axiosError.response.data : axiosError.message
+            axiosError.response ? axiosError.response.data : axiosError.message,
+            apiKey
         );
         throw error;
     }
 }
-
-// // Usage example
-// parseEventDetails(
-//   '"Do-Nothing Machine" Workshop!',
-//   'Come join the UTM Robotics Club for a fun and absurd afternoon of crafting your very own do-nothing machine using solenoids! Watch as your creation flicks a switch, only to immediately flick it back off... again... and again... and again. Channel your inner Sisyphus, but instead of pushing a boulder up a hill, you\'ll be pushing the boundaries of engineering futility.',
-//   'University of Toronto Mississauga, Innovation Complex, Room 3120',
-//   '2022-11-25',
-//   '4:00 PM'
-// )
-//   .then((data) => console.log(data))
-//   .catch((err) => console.error(err));

@@ -13,7 +13,7 @@ import {
   Typography,
   Backdrop,
 } from "@mui/material";
-import parseUserAnswers from "@/lib/parsers/userAnswersToTags";
+import parseUserAnswers from "@/lib/utils/userAnswersToTags";
 
 interface StudentSurveyModalProps {
   open: boolean;
