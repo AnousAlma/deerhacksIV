@@ -12,6 +12,7 @@ import { EventPostOutput } from "@/lib/db/models/post";
 import TagSelect from "./components/TagSelect";
 import SortSelect from "./components/SortSelect";
 import DateSelect from "./components/DateSelect";
+import StudentSurveyModal from "./components/PreferenceModal";
 
 
 const POSTS_PER_PAGE = 8;
@@ -26,9 +27,12 @@ export default function EventsPage() {
     const [sortBy, setSortBy] = useState<'newest' | 'popularity'>("newest");
     const [minimumDate, setMinimumDate] = useState("");
 
+    const [isModalOpen, setModalOpen] = useState(false);
+
+    
     const refreshPosts = () => {
     }
-
+    
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -62,7 +66,14 @@ export default function EventsPage() {
     }, []);
 
     console.log("events", events)
-
+    
+    useEffect(() => {
+      const userTags = localStorage.getItem('userTags');
+      if (!userTags) {
+        setModalOpen(true);
+      }
+    }, []);
+    
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
 
@@ -116,8 +127,9 @@ export default function EventsPage() {
     // const toggleFilters = () => {
     //     setShowFilters((prev) => !prev);
     // };
-
+    
     // // Handler for react-select multi-select dropdown.
+    
 
     return (
         <div style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
@@ -154,6 +166,7 @@ export default function EventsPage() {
                     ))}
                 </div>
             </div>
+            <StudentSurveyModal open={isModalOpen} onClose={() => setModalOpen(false)} />
         </div>
     );
 }
