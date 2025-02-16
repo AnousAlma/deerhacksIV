@@ -170,7 +170,7 @@ export default function EventsPage() {
                     ))}
                 </div>
             </div>
-            {/* <StudentSurveyModal open={isModalOpen} onClose={() => setModalOpen(false)} /> */}
+            <StudentSurveyModal open={isModalOpen} onClose={() => setModalOpen(false)} />
         </div>
     );
 }
