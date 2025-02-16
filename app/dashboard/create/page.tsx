@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import parseEventDetails from "@/api/parsers/eventToTags";
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -14,7 +15,6 @@ export default function CreateEventPage() {
   const [startDateTime, setStartDateTime] = useState(""); // New: Start datetime
   const [endDateTime, setEndDateTime] = useState(""); // New: End datetime
   const [location, setLocation] = useState("");
-  const [tag, setTag] = useState("");
   const [error, setError] = useState("");
 
   const { data: session, status } = useSession();
@@ -45,23 +45,30 @@ export default function CreateEventPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // TODO: upload image file 
+    try {
+        const eventTags = await parseEventDetails(title, description, location, startDateTime, endDateTime);
+        console.log('Event tags:', eventTags);
+        // *** Append event tags to the event's details ***
+        console.log({
+          title,
+          description,
+          startDateTime,
+          endDateTime,
+          location,
+          eventTags,
+          imageFile,
+        });
+        alert(`Event Created: ${title}`);
+        router.push("/dashboard");
+      } catch (error) {
+        console.error('Error parsing user answers:', error);
+        alert(`Error creating event: ${error}`);
+      }
 
-    console.log({
-      title,
-      description,
-      startDateTime,
-      endDateTime,
-      location,
-      tag,
-      imageFile,
-    });
-    alert(`Event Created: ${title}`);
-
-    router.push("/dashboard");
   };
 
   return (
@@ -141,21 +148,21 @@ export default function CreateEventPage() {
           </div>
 
           {/* Tag */}
-          <div>
+          {/* <div>
             <label className="block mb-2 text-lg font-medium text-[var(--foreground)]">
-              Tag
+              Tags
             </label>
             <select
               className="w-full h-12 px-4 text-lg rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={tag}
-              onChange={(e) => setTag(e.target.value)}
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
             >
               <option value="">-- Select a Tag --</option>
               <option value="online">Online</option>
               <option value="discord">Discord</option>
               <option value="other">Other</option>
             </select>
-          </div>
+          </div> */}
 
           {/* Image Upload */}
           <div>
