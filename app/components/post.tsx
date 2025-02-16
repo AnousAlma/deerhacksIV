@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Router, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface PostProps {
     id: number;
@@ -14,7 +15,10 @@ interface PostProps {
     endDate: Date;
     location: string;
     img_src?: string;
+    instagramUrl?: string;
+    discordUrl?: string;
     isDashboard?: boolean;
+    tags?: string;
     setReload?: (value: React.SetStateAction<number>) => void;
     tags?: string[];
 }
@@ -44,18 +48,7 @@ const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => 
     );
 };
 
-export default function Post({ 
-    id, 
-    title, 
-    description, 
-    startDate, 
-    endDate, 
-    location, 
-    img_src, 
-    isDashboard, 
-    setReload,
-    tags = [] 
-}: PostProps) {
+export default function Post({ id, title, description, startDate, endDate, location, img_src, isDashboard, setReload, instagramUrl, discordUrl, tags=[] }: PostProps) {
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { data: session, status } = useSession();
@@ -137,12 +130,14 @@ export default function Post({
                     </div>
 
                     <div className="absolute top-4 right-2 flex flex-col gap-2">
+                        { instagramUrl && (
                         <div className="p-2 bg-gray-700 rounded-md cursor-pointer transition-colors duration-200 hover:bg-white group">
-                            <FaInstagram className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-gray-700" />
-                        </div>
+                            <Link href="https://google.com"><FaInstagram className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-gray-700" /></Link>
+                        </div>)}
+                        { discordUrl && (
                         <div className="p-2 bg-gray-700 rounded-md cursor-pointer transition-colors duration-200 hover:bg-white group">
-                            <FaDiscord className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-gray-700" />
-                        </div>
+                            <Link href="https://google.com"><FaDiscord className="w-5 h-5 text-white transition-colors duration-200 group-hover:text-gray-700" /></Link>
+                        </div>)}
 
                         {isDashboard && (
                             <div className="p-2 bg-red-600 rounded-md cursor-pointer transition-colors duration-200 hover:bg-red-500 group" onClick={handleDelete}>
