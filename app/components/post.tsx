@@ -2,7 +2,9 @@
 import Image from "next/image";
 import { FaInstagram, FaDiscord, FaClock, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
 import { useState } from "react";
-import { X } from "lucide-react";
+import { Router, X } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface PostProps {
     id: number;
@@ -13,6 +15,7 @@ interface PostProps {
     location: string;
     img_src?: string;
     isDashboard?: boolean;
+    setReload?: (value: React.SetStateAction<number>) => void;
 }
 
 const dateFormat = new Intl.DateTimeFormat("en-US", {
@@ -40,8 +43,10 @@ const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => 
     );
 };
 
-export default function Post({ id, title, description, startDate, endDate, location, img_src, isDashboard }: PostProps) {
+export default function Post({ id, title, description, startDate, endDate, location, img_src, isDashboard, setReload }: PostProps) {
+    const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { data: session, status } = useSession();
 
     const formattedStartDate = `${dateFormat.format(new Date(startDate))} at ${timeFormat.format(new Date(startDate))}`;
     const formattedEndDate = `${dateFormat.format(new Date(endDate))} at ${timeFormat.format(new Date(endDate))}`;
@@ -50,6 +55,32 @@ export default function Post({ id, title, description, startDate, endDate, locat
     const handleDelete = (e: React.MouseEvent) => {
         e.stopPropagation();
         console.log("Delete post with ID:", id);
+
+        if (!session || !session.user) {
+            console.error("User not logged in");
+            router.push('/login')
+            return;
+        }
+
+        const data = { targetId: id }
+
+        fetch("/api/remove_post/", {
+            method: "POST",
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            console.log("setting reload")
+            setReload && setReload((prev) => prev + 1);
+            if (!response.ok) {
+                console.error("Failed with HTTP status code: " + response.status);
+                return;
+            }
+        })
+        .catch(error => {
+            console.error("Error deleting post:", error);
+        });
+
+        
     };
 
     return (

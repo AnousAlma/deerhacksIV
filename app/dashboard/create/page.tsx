@@ -35,8 +35,16 @@ export default function CreateEventPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!session || !session.user) {
+            setError("Access denied!");
+            return;
+        }
+       
         // TODO: upload image file 
         try {
+            const ownerId = session.user.email;        
+
             const datetime = startDate.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
             // const eventTags = await parseEventDetails(title, description, location, datetime);
             const data = {
@@ -44,7 +52,8 @@ export default function CreateEventPage() {
                 description,
                 startDate,
                 endDate,
-                location
+                location,
+                ownerId
             }
 
             const response = await fetch("/api/event_post/", {

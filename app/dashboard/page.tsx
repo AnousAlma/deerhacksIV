@@ -8,41 +8,75 @@ import { Filter, Plus } from "lucide-react";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { EventPostOutput } from "@/lib/db/models/post";
 
-function fetchUserPosts() {
-    return [
-        {
-            id: 1,
-            title: "I created this event",
-            description: "My event",
-            date: "2025-05-01",
-            post_tag: "online",
-            img_src: post_img,
-        },
-        {
-            id: 2,
-            title: "I also created this one",
-            description: "Description for the second event",
-            date: "2025-06-10",
-            location: "Room 202",
-            post_tag: "discord",
-            img_src: post_img,
-        },
-    ];
-}
 
 export default function DashboardPage() {
     const router = useRouter();
-    const userPosts = fetchUserPosts();
     const { data: session, status } = useSession();
 
+    const [events, setEvents] = useState<EventPostOutput[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const [reload, setReload] = useState(0);
+
+
     useEffect(() => {
-        if (!session) {
+        if (!session || !session.user) {
             toast.error("Access denied!", { position: "top-center" });
             router.push("/login");
         }
     }, [session, router]);
+
+    useEffect(() => {
+        console.log("reoload #", reload)
+        const fetchData = async () => {
+            if (!session || !session.user) {
+                router.push('/login');
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/all_event_posts");
+                if (!response.ok) throw new Error("Network response was not ok");
+
+                const result = await response.json();
+                console.log('erecieved r', result);
+
+                if (!('data' in result)) {
+                    console.log("Failed to parse result", result);
+                }
+
+                const data = result['data'];
+                if (!Array.isArray(data)) {
+                    console.log("Failed to parse data", data);
+                    throw new Error("Expected an array but got something else");
+                }
+
+                console.log('ereecieved', data);
+
+                const userEvents = data.filter((event) => event.ownerId === session.user?.email);
+
+                setEvents(userEvents);
+            } catch (err) {
+                if (err instanceof Error) {
+                    setError(err.message);
+                } else {
+                    setError("An unknown error occurred");
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [reload]);
+
+    if (loading) {
+        return <p>loading...</p>
+    }
 
     if (session) {
         return (
@@ -79,7 +113,7 @@ export default function DashboardPage() {
                             fontWeight: "bold",
                         }}
                     >
-                        Welcome back club1
+                        Welcome back {session.user?.name}!
                     </Typography>
                     <img
                         src="/images/mock_banner.png"
@@ -104,7 +138,7 @@ export default function DashboardPage() {
                     }}
                 >
                     <div className="flex items-center justify-between mb-4 mt-8">
-                        <p className="text-2xl">Posts</p>
+                        <p className="text-2xl">My Posts</p>
                         <div className="flex items-center gap-4">
                             <Link href="/dashboard/create">
                                 <button className="p-2 rounded-md hover:bg-gray-200">
@@ -117,11 +151,15 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {userPosts.map((post) => (
-                            <Post key={post.id} {...post} isDashboard /> // Add isDashboard prop
-                        ))}
-                    </div>
+                    <p>{error}</p>
+                    {events.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {events.map((event) => (
+                                <Post key={event.id} {...event} isDashboard setReload={setReload} /> // Add isDashboard prop
+                            ))}
+                        </div>
+                    ) : (<h3>Nothing yet, why don't you make one?</h3>)
+                    }
                 </Box>
             </Box>
         );
