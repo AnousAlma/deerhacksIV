@@ -204,27 +204,15 @@ const DashboardPage = () => {
           </div>
         )}
 
-        {/* Posts Grid */}
-        {events.length > 0 ? (
-          <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {events.map((event, index) => (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-                transition={{
-                  type: "spring",
-                  stiffness: 100,
-                  damping: 20,
-                  delay: index * 0.05,
-                }}
-                className="relative transform transition-all duration-300 hover:scale-[1.02]"
-              >
-                <Post {...event} isDashboard setReload={setReload} />
-              </motion.div>
-            ))}
-          </motion.div>
+            {/* Posts Grid */}
+            {events.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">
+                {events.map((event) => (
+                  <div key={event.id} className="transform hover:scale-102 transition-transform duration-200">
+                    <Post {...event} isDashboard setReload={setReload} />
+                  </div>
+                ))}
+              </div>
         ) : (
           <div className="text-center py-12">
             <h3 className="text-xl text-gray-600 dark:text-gray-400">

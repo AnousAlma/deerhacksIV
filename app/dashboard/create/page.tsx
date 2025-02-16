@@ -39,7 +39,10 @@ export default function CreateEventPage() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === "startDate" || name === "endDate" ? new Date(value) : value
+        }));
     };
 
 
@@ -184,7 +187,7 @@ export default function CreateEventPage() {
                                     type="datetime-local"
                                     name="startDate"
                                     className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                                    value={formData.startDate.toISOString().slice(0, 16)}
+                                    value={new Date(formData.startDate).toISOString().slice(0, 16)}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -202,7 +205,7 @@ export default function CreateEventPage() {
                                     type="datetime-local"
                                     name="endDate"
                                     className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                                    value={formData.endDate.toISOString().slice(0, 16)}
+                                    value={new Date(formData.endDate).toISOString().slice(0, 16)}
                                     onChange={handleInputChange}
                                     required
                                 />
