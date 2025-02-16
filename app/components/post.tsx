@@ -1,4 +1,3 @@
-// Post.tsx
 "use client";
 import Image from "next/image";
 import { FaInstagram, FaDiscord, FaClock, FaMapMarkerAlt } from "react-icons/fa";
@@ -51,26 +50,103 @@ export default function Post({
 }: PostProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Format start and end date-times with time information
-  const formattedStart = startDateTime
-    ? new Intl.DateTimeFormat("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-      }).format(new Date(startDateTime))
-    : "Start date not set";
+  // Convert date strings to Date objects
+  const startDateObj = startDateTime ? new Date(startDateTime) : null;
+  const endDateObj = endDateTime ? new Date(endDateTime) : null;
 
-  const formattedEnd = endDateTime
-    ? new Intl.DateTimeFormat("en-US", {
+  // Conditional formatting variables for card and modal displays
+  let dateDisplayCard;
+  let dateDisplayModal;
+
+  if (startDateObj && endDateObj) {
+    const sameDay =
+      startDateObj.getFullYear() === endDateObj.getFullYear() &&
+      startDateObj.getMonth() === endDateObj.getMonth() &&
+      startDateObj.getDate() === endDateObj.getDate();
+
+    if (sameDay) {
+      const datePart = new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }).format(startDateObj);
+      const startTime = new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+      }).format(startDateObj);
+      const endTime = new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+      }).format(endDateObj);
+
+      dateDisplayCard = (
+        <p className="text-sm text-gray-300 mb-2">
+          {datePart} - {startTime} to {endTime}
+        </p>
+      );
+      dateDisplayModal = (
+        <div className="flex items-center gap-2">
+          <FaClock className="text-gray-300 w-4 h-4" />
+          <span className="text-gray-300">
+            {datePart} - {startTime} to {endTime}
+          </span>
+        </div>
+      );
+    } else {
+      const formattedStart = new Intl.DateTimeFormat("en-US", {
         month: "long",
         day: "numeric",
         year: "numeric",
         hour: "numeric",
         minute: "numeric",
-      }).format(new Date(endDateTime))
-    : "End date not set";
+      }).format(startDateObj);
+      const formattedEnd = new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+      }).format(endDateObj);
+
+      dateDisplayCard = (
+        <>
+          <p className="text-sm text-gray-300 mb-2">Start: {formattedStart}</p>
+          <p className="text-sm text-gray-300 mb-2">End: {formattedEnd}</p>
+        </>
+      );
+      dateDisplayModal = (
+        <>
+          <div className="flex items-center gap-2">
+            <FaClock className="text-gray-300 w-4 h-4" />
+            <span className="text-gray-300">Start: {formattedStart}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FaClock className="text-gray-300 w-4 h-4" />
+            <span className="text-gray-300">End: {formattedEnd}</span>
+          </div>
+        </>
+      );
+    }
+  } else {
+    dateDisplayCard = (
+      <>
+        <p className="text-sm text-gray-300 mb-2">Start date not set</p>
+        <p className="text-sm text-gray-300 mb-2">End date not set</p>
+      </>
+    );
+    dateDisplayModal = (
+      <>
+        <div className="flex items-center gap-2">
+          <FaClock className="text-gray-300 w-4 h-4" />
+          <span className="text-gray-300">Start date not set</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <FaClock className="text-gray-300 w-4 h-4" />
+          <span className="text-gray-300">End date not set</span>
+        </div>
+      </>
+    );
+  }
 
   const handleCardClick = () => {
     setIsModalOpen(true);
@@ -97,8 +173,7 @@ export default function Post({
 
         <div className="flex-1 p-6 relative">
           <h2 className="text-xl font-semibold mb-1">{title}</h2>
-          <p className="text-sm text-gray-300 mb-2">Start: {formattedStart}</p>
-          <p className="text-sm text-gray-300 mb-2">End: {formattedEnd}</p>
+          {dateDisplayCard}
           <p className="text-gray-300 text-sm md:text-base mb-2 pr-4">
             {description}
           </p>
@@ -164,14 +239,7 @@ export default function Post({
         <div className="p-6 text-white">
           <h2 className="text-2xl font-semibold mb-2">{title}</h2>
           <div className="flex flex-col gap-1 mb-4">
-            <div className="flex items-center gap-2">
-              <FaClock className="text-gray-300 w-4 h-4" />
-              <span className="text-gray-300">Start: {formattedStart}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <FaClock className="text-gray-300 w-4 h-4" />
-              <span className="text-gray-300">End: {formattedEnd}</span>
-            </div>
+            {dateDisplayModal}
             {location && (
               <div className="flex items-center gap-2">
                 <FaMapMarkerAlt className="text-gray-300 w-4 h-4" />
