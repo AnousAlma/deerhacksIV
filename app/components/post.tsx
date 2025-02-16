@@ -10,13 +10,17 @@ interface PostProps {
     id: number;
     title: string;
     description: string;
-    date?: string;
-    location?: string;
-    post_tag?: string;
+    startDate: Date;
+    endDate: Date;
+    location: string;
     img_src?: string;
 }
 
-
+const dateFormat = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+});
 
 
 // Modal Component
@@ -47,22 +51,17 @@ const Modal = ({ isOpen, onClose, children }) => {
 export default function Post({
     title,
     description,
-    date,
+    startDate,
+    endDate,
     location,
-    post_tag,
     img_src,
 }: PostProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const tags = ["Club 1", "Nature", "Tech", "Poker"];
 
 
-    const formattedDate = date
-        ? new Intl.DateTimeFormat("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-        }).format(new Date(date))
-        : "February 15, 2025";
+    const formattedStartDate = dateFormat.format(new Date(startDate));
+    const formattedEndDate = dateFormat.format(new Date(endDate));
 
 
     const handleCardClick = () => {
@@ -107,7 +106,7 @@ export default function Post({
 
                 <div className="flex-1 p-6 relative">
                     <h2 className="text-xl font-semibold mb-1">{title}</h2>
-                    <p className="text-sm text-gray-300 mb-2">{formattedDate}</p>
+                    <p className="text-sm text-gray-300 mb-2">{formattedStartDate}</p>
                     <p className="text-gray-300 text-sm md:text-base mb-2 pr-4">
                         {description}
                     </p>
@@ -179,7 +178,7 @@ export default function Post({
                         <div className="flex items-center gap-2">
                             <FaClock className="text-gray-300 w-4 h-4" />
                             <span className="text-gray-300">
-                                {formattedDate}
+                                {formattedStartDate}
                             </span>
                         </div>
                         {location && (

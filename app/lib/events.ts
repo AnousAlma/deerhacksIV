@@ -5,6 +5,7 @@ export default function fetchData() {
 
     { 'title': 'GDSC UTM: Intro to Large Language Models', 'description': 'GDSC UTM is hosting our third machine learning workshop, this time covering Intro to Large Language Models.', 'location': 'DH2060', 'date': '1 Mar', 'time': '18:00 - 19:00', 'img_src': '/images/hero-img.png' }]
 }
+
 export function getFeaturedImages() {
     const events = fetchData();
     // Get the last 5

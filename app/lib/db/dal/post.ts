@@ -1,6 +1,7 @@
 import { EventPost, EventPostInput, EventPostOutput } from '../models/post'
 
 export const create = async (payload: EventPostInput): Promise<EventPostOutput> => {
+    console.log('creating payload',)
     const post = await EventPost.create(payload)
     return post
 }
