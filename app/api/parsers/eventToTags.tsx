@@ -36,7 +36,7 @@ async function parseEventDetails(
     }
   
   Your task:
-  Pick 3 to 5 tags from the following list that you feel like best describe the event. Then return a list of the tags in the output format below.
+  Pick 0 to 5 tags from the following list that you feel like best describe the event. Then return a list of the tags in the output format below.
   
   Tags:
   ["Academic", "Art", "Music", "Dance", "Theatre", "Film", "Poetry", "Culture", "Debate", "Robotics", "Coding", "Hackathon", "Engineering", "Science", "Math", "Writing", "Literature", "History", "Philosophy", "Politics", "Environment", "Sustainability", "Volunteer", "Charity", "Networking", "Career", "Business", "Entrepreneurship", "Finance", "Investment", "Sports", "Fitness", "Yoga", "Running", "Soccer", "Basketball", "Tennis", "Hiking", "Gaming", "Chess", "Photography", "Design", "Fashion", "Food", "Cooking", "Travel", "Language", "Meditation", "Wellness", "Community"]
@@ -44,7 +44,7 @@ async function parseEventDetails(
   Output Format:
   [<tag1>, <tag2>, <tag3>... and so on up to 5 tags]
   
-  Strictly adhere to this format and provide output only in JSON array format.
+  Strictly adhere to this format and provide output only in JSON array format, never ever ever use tags that aren't from above, if you do not have enough information pick the closest tag or just output no tags.
   `;
 
   try {

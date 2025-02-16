@@ -6,10 +6,11 @@ interface EventPostAttributes {
     title: string;
     description: string;
     location: string;
-    eventDate: Date;
+    startDate: Date;
+    endDate: Date;
     createdAt?: Date;
 }
-export interface EventPostInput extends Required<EventPostAttributes> { }
+export interface EventPostInput extends Optional<EventPostAttributes, 'id' | 'createdAt'> { }
 export interface EventPostOutput extends Required<EventPostAttributes> { }
 
 export class EventPost extends Model<EventPostAttributes, EventPostInput> implements EventPostAttributes {
@@ -17,7 +18,8 @@ export class EventPost extends Model<EventPostAttributes, EventPostInput> implem
     public title!: string
     public description!: string
     public location!: string
-    public eventDate!: Date;
+    public startDate!: Date;
+    public endDate!: Date;
 
     public readonly createdAt!: Date;
 }
@@ -28,6 +30,7 @@ EventPost.init(
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
+            allowNull: false
         },
         title: {
             type: DataTypes.STRING,
@@ -37,7 +40,11 @@ EventPost.init(
             type: DataTypes.TEXT,
             allowNull: false,
         },
-        eventDate: {
+        startDate: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+        endDate: {
             type: DataTypes.DATE,
             allowNull: false,
         },

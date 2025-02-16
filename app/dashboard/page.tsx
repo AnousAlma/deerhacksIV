@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Box, Typography } from "@mui/material";
-import Post from "@/components/post";
+import Post from "@/components/Post";
 import post_img from "../../public/images/hero-img.png";
 import { Filter, Plus } from "lucide-react";
 import Link from "next/link";

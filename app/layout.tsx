@@ -5,7 +5,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthProvider from "./components/AuthProvider";
 
-
 // Poppins font
 const poppins = Poppins({
     weight: ["400", "500", "600", "700"], // Specify the weights you need
