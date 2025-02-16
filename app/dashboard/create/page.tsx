@@ -31,6 +31,7 @@ export default function CreateEventPage() {
         endDate: new Date(),
         discordLink: "",
         instagramLink: "",
+        previewURL: "",
     });
 
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -52,9 +53,12 @@ export default function CreateEventPage() {
             return;
         }
 
+        const tags = await parseEventDetails(formData.title, formData.description, formData.location, formData.startDate.toISOString());
+
         try {
             const data = {
                 ...formData,
+                tags,
                 ownerId: session.user.email,
             };
 

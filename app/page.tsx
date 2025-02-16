@@ -24,10 +24,6 @@ export default function EventsPage() {
     const [isModalOpen, setModalOpen] = useState(false);
     const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
-    const refreshPosts = () => {
-        // Implementation remains the same
-    };
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -54,6 +50,12 @@ export default function EventsPage() {
                     data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
                 } else if (sortBy === "alphabetical") {
                     data.sort((a, b) => a.title.localeCompare(b.title));
+                }
+
+                if (selectedTags.length > 0) {
+                    data = data.filter((event) => {
+                        return selectedTags.some((tag) => event.tags.split(',').includes(tag));
+                    });
                 }
 
                 setEvents(data);
@@ -168,51 +170,48 @@ export default function EventsPage() {
                     </button>
                 </div>
 
-            </motion.div>
-        )}
-    </AnimatePresence>
 
-    {/* Posts Grid */}
-    <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-    >
-        {events.map((event, index) => (
-            <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-                transition={{ 
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 20,
-                    delay: index * 0.05,
-                }}
-                className="relative transform transition-all duration-300 hover:scale-[1.02]"
-            >
-                {/* Gradient overlay for text */}
-                <Post {...event} />
-            </motion.div>
-        ))}
-    </motion.div>
-</div>
+                {/* Posts Grid */}
+                <motion.div
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                >
+                    {events.map((event, index) => (
+                        <motion.div
+                            key={event.id}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+                            transition={{
+                                type: "spring",
+                                stiffness: 100,
+                                damping: 20,
+                                delay: index * 0.05,
+                            }}
+                            className="relative transform transition-all duration-300 hover:scale-[1.02]"
+                        >
+                            {/* Gradient overlay for text */}
+                            <Post {...event} />
+                        </motion.div>
+                    ))}
+                </motion.div>
 
-            {/* Modal */}
-            <AnimatePresence>
-                {isModalOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
-                        <StudentSurveyModal
-                            open={isModalOpen}
-                            onClose={() => setModalOpen(false)}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
-            <style jsx global>{`
+
+                {/* Modal */}
+                <AnimatePresence>
+                    {isModalOpen && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                        >
+                            <StudentSurveyModal
+                                open={isModalOpen}
+                                onClose={() => setModalOpen(false)}
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                <style jsx global>{`
                 @keyframes bounce {
                     0%, 100% {
                         transform: translateY(0);
@@ -225,6 +224,7 @@ export default function EventsPage() {
                     animation: bounce 2s infinite;
                 }
             `}</style>
-        </div>
+            </div>
+            </div>
     );
 }

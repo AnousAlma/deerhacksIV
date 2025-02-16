@@ -47,13 +47,16 @@ export async function POST(req: Request) {
 
     try {
         const result = await req.json();
-        const { title, description, startDate, endDate, location, ownerId } = result;
+        const { title, description, startDate, endDate, location, ownerId, previewUrl, tags } = result;
 
-        const data = { title, description, startDate, endDate, location, ownerId };
+        const data = { title, description, startDate, endDate, location, ownerId, previewUrl, tags };
         console.log("on the server, recieved package ", data);
 
         if (!title || !description || !startDate || !location) {
             return NextResponse.json({ error: "title, description, startDate and location are required" }, { status: 400 });
+        }
+        if (tags && Array.isArray(tags)) {
+            data.tags = tags.join(",");
         }
         const newPost = await EventPost.create(data);
 
