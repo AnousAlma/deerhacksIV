@@ -58,7 +58,6 @@ export default function Post({ id, title, description, startDate, endDate, locat
 
     // Limit tags to first 5
     const displayTags = tags.slice(0, 5);
-    const remainingTags = tags.length > 5 ? tags.length - 5 : 0;
 
     const handleCardClick = () => setIsModalOpen(true);
     const handleDelete = (e: React.MouseEvent) => {
@@ -122,11 +121,6 @@ export default function Post({ id, title, description, startDate, endDate, locat
                                 {tag}
                             </span>
                         ))}
-                        {remainingTags > 0 && (
-                            <span className="px-2 py-1 bg-[#2A3B50] text-xs rounded-full text-gray-300">
-                                +{remainingTags} more
-                            </span>
-                        )}
                     </div>
 
                     <div className="absolute top-4 right-2 flex flex-col gap-2">

@@ -187,7 +187,7 @@ export default function CreateEventPage() {
                                     type="datetime-local"
                                     name="startDate"
                                     className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                                    value={new Date(formData.startDate).toISOString().slice(0, 16)}
+                                    value={formData.startDate.toISOString().slice(0, 16)}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -205,7 +205,7 @@ export default function CreateEventPage() {
                                     type="datetime-local"
                                     name="endDate"
                                     className="w-full px-4 py-3 rounded-lg bg-background/50 border border-input transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                                    value={new Date(formData.endDate).toISOString().slice(0, 16)}
+                                    value={formData.endDate.toISOString().slice(0, 16)}
                                     onChange={handleInputChange}
                                     required
                                 />
