@@ -67,7 +67,6 @@ export default function DashboardPage() {
                         marginBottom: "20px",
                         justifyContent: "start",
                         alignItems: "end",
-                        background: "rgb(2,0,36)",
                         background: "linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(31,41,55,0.4767156862745098) 0%, rgba(255,255,255,1) 40%)"
                     }}
                 >
@@ -109,11 +108,11 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-4">
                             <Link href="/dashboard/create">
                                 <button className="p-2 rounded-md hover:bg-gray-200">
-                                    <Plus className="w-6 h-6 text-black" />
+                                    <Plus className="w-6 h-6 text-orange" />
                                 </button>
                             </Link>
                             <button className="p-2 rounded-md hover:bg-gray-200">
-                                <Filter className="w-6 h-6 text-black" />
+                                <Filter className="w-6 h-6 text-orange" />
                             </button>
                         </div>
                     </div>

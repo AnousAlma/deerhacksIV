@@ -7,7 +7,7 @@ function persistItem(key: string, value: string) {
     return value
 }
 
-function usePersistentState(key: string, initialValue?: string): [string, (newState: string) => string] {
+function usePersistentState(key: string, initialValue: string): [string, (newState: string) => string] {
     const [state, setState] = useState(
         () => localStorage.getItem(key) || persistItem(key, initialValue)
     )
@@ -24,7 +24,7 @@ function usePersistentState(key: string, initialValue?: string): [string, (newSt
 
 
 export default function ThemeToggle() {
-    const [theme, setTheme] = usePersistentState("light");
+    const [theme, setTheme] = usePersistentState("theme", "light");
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
