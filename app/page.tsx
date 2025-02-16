@@ -14,6 +14,7 @@ import { EventPostOutput } from "@/lib/db/models/post";
 const POSTS_PER_PAGE = 8;
 
 export default function EventsPage() {
+    // load events from the database
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -25,8 +26,21 @@ export default function EventsPage() {
                 if (!response.ok) throw new Error("Network response was not ok");
 
                 const result = await response.json();
-                console.log("RECIEVED RESULT", result)
-                setEvents(result);
+                console.log('recieved r', result);
+
+                if (!('data' in result)) {
+                    console.log("Failed to parse result", result);  
+                }
+                
+                const data = result['data'];
+                if (!Array.isArray(data)) {
+                    console.log("Failed to parse data", data);  
+                    throw new Error("Expected an array but got something else");
+                }
+
+                console.log('recieved', data);
+
+                setEvents(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -36,10 +50,11 @@ export default function EventsPage() {
 
         fetchData();
     }, []);
+    
+    console.log("events", events)
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
-
 
     const [currentPage, setCurrentPage] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
@@ -244,11 +259,11 @@ export default function EventsPage() {
                 </div>
 
                 {/* Posts */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {events.map((e: EventPostOutput) => (
-                        <Post key={e.id} {...e} />
-                    ))}
-                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {events.map((event: EventPostOutput) => (
+                            <Post key={event.id} {...event} />
+                        ))}
+                    </div>
             </div>
         </div>
     );
