@@ -9,9 +9,11 @@ interface EventPostAttributes {
     startDate: Date;
     endDate: Date;
     ownerId?: string;
+    discordUrl?: string;
+    instagramUrl?: string;
     createdAt?: Date;
 }
-export interface EventPostInput extends Optional<EventPostAttributes, 'id' | 'createdAt' | 'ownerId'> { }
+export interface EventPostInput extends Optional<EventPostAttributes, 'id' | 'createdAt' | 'ownerId' | 'discordUrl' | 'instagramUrl'> { }
 export interface EventPostOutput extends Required<EventPostAttributes> { }
 
 export class EventPost extends Model<EventPostAttributes, EventPostInput> implements EventPostAttributes {
@@ -22,6 +24,8 @@ export class EventPost extends Model<EventPostAttributes, EventPostInput> implem
     public startDate!: Date;
     public endDate!: Date;
     public ownerId!: string;
+    public discordUrl!: string;
+    public instagramUrl!: string;
 
     public readonly createdAt!: Date;
 }
@@ -55,6 +59,14 @@ EventPost.init(
             allowNull: false,
         },
         ownerId: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        discordUrl: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        instagramUrl: {
             type: DataTypes.STRING,
             allowNull: true,
         },

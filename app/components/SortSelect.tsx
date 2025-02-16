@@ -22,7 +22,7 @@ export default function SortSelect({ sortBy, setSortBy, refreshPosts }: SortSele
                 onChange={handleSortChange}
             >
                 <option value="newest">Newest to Oldest</option>
-                <option value="popularity">Popularity</option>
+                <option value="alphabetical">Alphabetical</option>
             </select>
         </div>
     );
