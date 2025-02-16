@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import parseEventDetails from "@/api/parsers/eventToTags";
 
+import { create as createPost } from "@/lib/db/dal/post";
+
 export default function CreateEventPage() {
   const router = useRouter();
 
@@ -62,7 +64,21 @@ export default function CreateEventPage() {
           eventTags,
           imageFile,
         });
-        alert(`Event Created: ${title}`);
+        
+
+        const eventDate: Date = new Date(date);
+
+        const result = await createPost({
+            title,
+            description,
+            eventDate,
+            location
+        })
+        if (result) {
+            setError("Error creating event");
+            return;
+        }
+
         router.push("/dashboard");
       } catch (error) {
         console.error('Error parsing user answers:', error);
