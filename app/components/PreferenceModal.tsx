@@ -1,19 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  TextField,
-  Typography,
-  Backdrop,
-} from "@mui/material";
-import parseUserAnswers from "@/lib/utils/userAnswersToTags";
+import { parseUserAnswers } from "@/lib/utils/userAnswersToTags";
 
 interface StudentSurveyModalProps {
   open: boolean;
