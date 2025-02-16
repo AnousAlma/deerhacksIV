@@ -20,7 +20,7 @@ export default function EventsPage() {
     // load events from the database
     const [events, setEvents] = useState<EventPostOutput[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
 
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState<'newest' | 'popularity'>("newest");
@@ -52,7 +52,11 @@ export default function EventsPage() {
 
                 setEvents(data);
             } catch (err) {
-                setError(err.message);
+                if (err instanceof Error) {
+                    setError(err.message);
+                } else {
+                    setError("An unknown error occurred");
+                }
             } finally {
                 setLoading(false);
             }
