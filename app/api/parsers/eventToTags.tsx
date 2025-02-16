@@ -5,7 +5,7 @@ type TagsResponse = Tag[];
 
 // Define the OpenAI API response structure
 interface OpenAIResponse {
-  choices: {
+  choicnes: {
     message: {
       content: string;
     };

@@ -1,9 +1,35 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FiSun, FiMoon } from 'react-icons/fi';
 
+function persistItem(key: string, value: string) {
+    if (typeof window !== "undefined") {
+        localStorage.setItem(key, value);
+    }
+    return value;
+}
+
+function usePersistentState(key: string, initialValue: string): [string, (newState: string) => string] {
+    const [state, setState] = useState(() => {
+        if (typeof window !== "undefined") {
+            return localStorage.getItem(key) || persistItem(key, initialValue);
+        } else {
+            return initialValue;
+        }
+    });
+
+    const setStateAndPersist = useCallback(
+        (newState: string) => {
+            setState(newState);
+            return persistItem(key, newState);
+        },
+        [key, setState]
+    );
+    return [state, setStateAndPersist];
+}
+
 export default function ThemeToggle() {
-    const [theme, setTheme] = useState("light");
+    const [theme, setTheme] = usePersistentState("theme", "light");
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);

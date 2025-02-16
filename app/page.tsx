@@ -1,16 +1,12 @@
 "use client";
 import { Filter } from "lucide-react";
-
 import fetchData, { getFeaturedImages } from "./lib/events";
-
 import { useState } from "react";
 import Select from "react-select";
-
 import Pagination from "./components/Pagination";
 import Post from "./components/Post";
 import Header from "./components/Header";
 import Gallery from "./components/Gallery";
-
 
 const POSTS_PER_PAGE = 8;
 
@@ -100,66 +96,106 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="text-white min-h-screen">
+    <div style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
+      {/* For you heading */}
+      <div className="flex justify-center my-8">
+        <h1 className="text-[40px]" style={{ color: 'var(--foreground)' }}>
+          For you 🫵
+        </h1>
+      </div>
+
       {/* Featured Images */}
       <Gallery images={featuredImages} />
 
       {/* Main container */}
-      <div className="max-w-7xl mx-auto p-4">
+      <div className="mx-auto px-16 py-8">
         {/* Title + Filter icon */}
         <div className="flex items-center justify-between mb-4 mt-8">
-          <p className="text-2xl">Posts</p>
-          {/* <button onClick={toggleFilters} className="p-2 rounded-md hover:bg-gray-200">
-            <Filter className="w-6 h-6 text-black" />
-          </button> */}
+          <p className="text-2xl" style={{ color: 'var(--foreground)' }}>Posts</p>
         </div>
 
         {/* Filter panel */}
-       
-          <div className="bg-gray-700 p-4 mb-4 rounded">
-            <div className="flex flex-col md:flex-row md:items-center gap-4">
-              {/* Tag filter dropdown using react-select */}
-              <div className="flex flex-col w-full md:w-1/3">
-                <label htmlFor="tagFilter" className="mb-1">Tags</label>
-                <Select
-                className="text-black"
-                  id="tagFilter"
-                  options={tagOptions}
-                  isMulti
-                  value={tagOptions.filter(option => selectedTags.includes(option.value))}
-                  onChange={handleTagSelectChange}
-                  placeholder="Select tags..."
-                />
-              </div>
+        <div className="bg-gray-700 p-4 mb-4 rounded">
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
+            {/* Tag filter dropdown using react-select */}
+            <div className="flex flex-col w-full md:w-1/3">
+              <label htmlFor="tagFilter" className="mb-1" style={{ color: 'white' }}>Tags</label>
+              <Select
+                id="tagFilter"
+                options={tagOptions}
+                isMulti
+                value={tagOptions.filter(option => selectedTags.includes(option.value))}
+                onChange={handleTagSelectChange}
+                placeholder="Select tags..."
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    minHeight: '40px',
+                    height: '40px',
+                    borderRadius: '0.375rem',
+                    border: '1px solid var(--foreground)',
+                  }),
+                  singleValue: (base) => ({
+                    ...base,
+                    color: 'var(--foreground)'
+                  }),
+                  menu: (base) => ({
+                    ...base,
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)'
+                  }),
+                  option: (base) => ({
+                    ...base,
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    '&:hover': {
+                      backgroundColor: 'var(--foreground)',
+                      color: 'var(--background)'
+                    }
+                  })
+                }}
+              />
+            </div>
 
-              {/* Sorting */}
-              <div className="flex flex-col w-full md:w-1/3">
-                <label htmlFor="sortBy">Sort</label>
-                <select
-                  id="sortBy"
-                  className="text-black p-1"
-                  value={sortBy}
-                  onChange={handleSortChange}
-                >
-                  <option value="newest">Newest to Oldest</option>
-                  <option value="popularity">Popularity</option>
-                </select>
-              </div>
+            {/* Sorting */}
+            <div className="flex flex-col w-full md:w-1/3">
+              <label htmlFor="sortBy" style={{ color: 'white' }}>Sort</label>
+              <select
+                id="sortBy"
+                className="px-2 rounded h-[40px] w-full"
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--foreground)'
+                }}
+                value={sortBy}
+                onChange={handleSortChange}
+              >
+                <option value="newest">Newest to Oldest</option>
+                <option value="popularity">Popularity</option>
+              </select>
+            </div>
 
-              {/* Date filter */}
-              <div className="flex flex-col w-full md:w-1/3">
-                <label htmlFor="dateFilter">Date</label>
-                <input
-                  id="dateFilter"
-                  type="date"
-                  className="text-black p-1"
-                  value={dateFilter}
-                  onChange={handleDateChange}
-                />
-              </div>
+            {/* Date filter */}
+            <div className="flex flex-col w-full md:w-1/3">
+              <label htmlFor="dateFilter" style={{ color: 'white' }}>Date</label>
+              <input
+                id="dateFilter"
+                type="date"
+                className="px-2 rounded h-[40px] w-full"
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--foreground)'
+                }}
+                value={dateFilter}
+                onChange={handleDateChange}
+              />
             </div>
           </div>
-
+        </div>
 
         {/* Posts */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

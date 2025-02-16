@@ -23,14 +23,12 @@ interface PostProps {
 const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
     return (
-        // 1) Clicking this outer div will close the modal
         <div
             className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
             onClick={onClose}
         >
-            {/* 2) Prevent clicks inside the modal from closing it */}
             <div
-                className="relative bg-[#2A3B50] rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+                className="relative bg-[#2A3B50] rounded-xl w-[40vw] max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button

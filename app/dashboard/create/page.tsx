@@ -1,12 +1,31 @@
 "use client";
 import { useState } from "react";
 
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation";
+
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from "react";
+
 export default function CreateEventPage() {
+    const router = useRouter();
+
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState("");
     const [location, setLocation] = useState("");
     const [tag, setTag] = useState("");
+    const [error, setError] = useState("");
+
+    const { data: session, status } = useSession()
+    
+    useEffect(() => {
+        if (!session) {
+            toast.error("Access denied!", { position: "top-center" });
+            router.push("/login");
+        }
+    }, [session, router]);
 
     // New states for image file and preview URL
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -31,8 +50,7 @@ export default function CreateEventPage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // In a real app, you'd handle the file upload here
-        // e.g., POST to an API endpoint or use a storage service (S3, Cloudinary, etc.)
+        // TODO: upload image file 
 
         console.log({
             title,
@@ -44,14 +62,7 @@ export default function CreateEventPage() {
         });
         alert(`Event Created: ${title}`);
 
-        // Reset form
-        setTitle("");
-        setDescription("");
-        setDate("");
-        setLocation("");
-        setTag("");
-        setImageFile(null);
-        setPreviewURL("");
+        router.push("/dashboard");
     };
 
     return (
