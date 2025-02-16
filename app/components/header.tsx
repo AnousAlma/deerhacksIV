@@ -5,7 +5,8 @@ import ThemeToggle from "./themetoggle";
 export default function Header() {
     return (
         <header>
-            <nav className="flex flex-wrap items-center justify-between px-6 bg-[#1a1f3d] shadow">
+            <nav className="flex flex-wrap items-center justify-between px-6 shadow"
+            style={{ backgroundColor: '#1f2937' }}>
                 <Link href="/">
                     <div className="flex items-center gap-2">
                         <img
@@ -33,3 +34,4 @@ export default function Header() {
         </header>
     );
 }
+
