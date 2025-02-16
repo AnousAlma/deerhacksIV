@@ -1,8 +1,6 @@
 "use client";
 import Select from "react-select";
 
-
-
 const availableTags = [
     "nature", "coding", "music", "sports", "art", "travel", "food", "tech",
     "education", "health", "science", "history", "literature", "fashion", "politics",
@@ -14,7 +12,6 @@ const availableTags = [
 ];
 const tagOptions = availableTags.map((tag) => ({ value: tag, label: tag }));
 
-
 interface TagSelectProps {
     selectedTags: string[];
     setSelectedTags: (tags: string[]) => void;
@@ -22,7 +19,6 @@ interface TagSelectProps {
 }
 
 export default function TagSelect({ selectedTags, setSelectedTags, refreshPosts }: TagSelectProps) {
-    
     const handleTagSelectChange = (selectedOptions: any) => {
         setSelectedTags(
             selectedOptions ? selectedOptions.map((option: any) => option.value) : []
@@ -32,7 +28,7 @@ export default function TagSelect({ selectedTags, setSelectedTags, refreshPosts 
 
     return (
         <div className="flex flex-col w-full md:w-1/3">
-            <label htmlFor="tagFilter" className="mb-1" style={{ color: 'white' }}>Tags</label>
+            <label htmlFor="tagFilter" className="mb-1 text-foreground">Tags</label>
 
             <Select
                 id="tagFilter"
@@ -54,7 +50,7 @@ export default function TagSelect({ selectedTags, setSelectedTags, refreshPosts 
                     }),
                     input: (base) => ({
                         ...base,
-                        color: 'white', // Ensures typed text is white
+                        color: 'var(--foreground)', // Ensures typed text matches the theme
                     }),
                     singleValue: (base) => ({
                         ...base,

@@ -1,13 +1,12 @@
 "use client";
 
-interface TagSelectProps {
+interface SortSelectProps {
     sortBy: 'newest' | 'popularity';
     setSortBy: (value: 'newest' | 'popularity') => void;
     refreshPosts: () => void;
 }
 
-export default function SortSelect({ sortBy, setSortBy, refreshPosts }: TagSelectProps) {
-    
+export default function SortSelect({ sortBy, setSortBy, refreshPosts }: SortSelectProps) {
     const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSortBy(e.target.value as 'newest' | 'popularity');
         refreshPosts();
@@ -15,15 +14,10 @@ export default function SortSelect({ sortBy, setSortBy, refreshPosts }: TagSelec
 
     return (
         <div className="flex flex-col w-full md:w-1/3">
-            <label htmlFor="sortBy" style={{ color: 'white' }}>Sort</label>
+            <label htmlFor="sortBy" className="text-foreground">Sort</label>
             <select
                 id="sortBy"
-                className="px-2 rounded h-[40px] w-full"
-                style={{
-                    backgroundColor: 'var(--background)',
-                    color: 'var(--foreground)',
-                    border: '1px solid var(--foreground)'
-                }}
+                className="px-2 rounded h-[40px] w-full bg-background text-foreground border border-foreground"
                 value={sortBy}
                 onChange={handleSortChange}
             >
