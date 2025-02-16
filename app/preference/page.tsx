@@ -1,8 +1,13 @@
 "use client"
 import React, { useState } from 'react';
 import { Card, CardHeader, CardContent, CardActions, Typography, Button, RadioGroup, FormControlLabel, Radio, TextField } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import parseUserAnswers from "../api/parsers/userAnswersToTags";
 
 export default function StudentSurveyForm() {
+  const router = useRouter();
+
+
   const [formData, setFormData] = useState({
     yearOfStudy: '',
     major: '',
@@ -13,10 +18,17 @@ export default function StudentSurveyForm() {
     superpower: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
-    // Handle form submission logic here
+    try {
+      const userTags = await parseUserAnswers(formData.yearOfStudy, formData.major, formData.hobbies, formData.freeTime, formData.friendsDescription, formData.socialActivity, formData.superpower);
+      console.log('User tags:', userTags);
+      // *** Append user tags to the user's profile ***
+      router.push("/");
+    } catch (error) {
+      console.error('Error parsing user answers:', error);
+    }
   };
 
   const handleChange = (field, value) => {

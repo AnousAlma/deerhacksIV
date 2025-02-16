@@ -22,7 +22,7 @@ export default function EventsPage() {
 
   const featuredImages = getFeaturedImages();
 
-  // CHATGPT generated placeholder tags
+  // Placeholder tags – adjust with your actual 50+ tags as needed.
   const availableTags = [
     "nature", "coding", "music", "sports", "art", "travel", "food", "tech",
     "education", "health", "science", "history", "literature", "fashion", "politics",
@@ -46,10 +46,10 @@ export default function EventsPage() {
       return eventTags.some((tag) => lowerCaseSelected.includes(tag));
     })
     // Filter by date (only show events on or after the given date)
-    .filter((e) => {
-      if (!dateFilter) return true;
-      return e.date >= dateFilter;
-    });
+   .filter((e) => {
+  if (!dateFilter) return true;
+  return new Date(e.startDateTime) >= new Date(dateFilter);
+});
 
   // 2) Sort the filtered events
   const sortedEvents = [...filteredEvents].sort((a, b) => {
@@ -124,6 +124,7 @@ export default function EventsPage() {
                 id="tagFilter"
                 options={tagOptions}
                 isMulti
+                isSearchable={true}
                 value={tagOptions.filter(option => selectedTags.includes(option.value))}
                 onChange={handleTagSelectChange}
                 placeholder="Select tags..."
@@ -136,6 +137,10 @@ export default function EventsPage() {
                     height: '40px',
                     borderRadius: '0.375rem',
                     border: '1px solid var(--foreground)',
+                  }),
+                  input: (base) => ({
+                    ...base,
+                    color: 'white', // Ensures typed text is white
                   }),
                   singleValue: (base) => ({
                     ...base,
@@ -156,6 +161,7 @@ export default function EventsPage() {
                     }
                   })
                 }}
+                
               />
             </div>
 
