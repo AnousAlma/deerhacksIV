@@ -32,6 +32,36 @@ export default function Gallery({ images }: GalleryProps) {
 
     return (
         <div className="relative w-full flex flex-col items-center py-6">
+            <style jsx>{`
+                .slide-transition {
+                    transition: transform 800ms cubic-bezier(0.34, 1.28, 0.64, 1), 
+                                opacity 600ms cubic-bezier(0.4, 0.0, 0.2, 1);
+                }
+                
+                .slide-enter {
+                    transition-timing-function: cubic-bezier(0.34, 1.28, 0.64, 1);
+                }
+                
+                .slide-exit {
+                    transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+                }
+                
+                .image-scale {
+                    transition: transform 900ms cubic-bezier(0.34, 1.28, 0.64, 1);
+                }
+                
+                @keyframes smoothSpring {
+                    0% {
+                        transform: scale(1);
+                    }
+                    50% {
+                        transform: scale(1.03);
+                    }
+                    100% {
+                        transform: scale(1.02);
+                    }
+                }
+            `}</style>
             <div
                 className="relative mt-[160px]"
                 style={{ width: containerWidth, height: '560px' }}
@@ -52,7 +82,7 @@ export default function Gallery({ images }: GalleryProps) {
                     return (
                         <div
                             key={`${src}-${i}`}
-                            className={`absolute top-0 transform-gpu transition-[transform,opacity] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${opacity}`}
+                            className={`absolute top-0 transform-gpu slide-transition ${opacity}`}
                             style={{
                                 width: '800px',
                                 height: '480px',
@@ -64,7 +94,11 @@ export default function Gallery({ images }: GalleryProps) {
                             <img
                                 src={src}
                                 alt={`Gallery item ${i}`}
-                                className="w-full h-full object-cover rounded aspect-[16/9]"
+                                className={`w-full h-full object-cover rounded-lg aspect-[16/9] shadow-2xl shadow-gray-800/60 image-scale`}
+                                style={{
+                                    transform: isCurrent ? 'scale(1.02)' : 'scale(1)',
+                                    animation: isCurrent ? 'smoothSpring 900ms forwards' : 'none'
+                                }}
                             />
                         </div>
                     );
@@ -72,14 +106,14 @@ export default function Gallery({ images }: GalleryProps) {
             </div>
             <button
                 onClick={prevSlide}
-                className="absolute left-0 top-80 transform -translate-y-1/2 bg-[#2b3350] hover:bg-[#394063] px-3 py-1 rounded shadow transition-colors duration-200"
+                className="absolute left-0 top-80 transform -translate-y-1/2 bg-[#2b3350] hover:bg-[#394063] px-3 py-1 rounded shadow-lg transition-all duration-500 hover:scale-110 slide-transition"
                 style={{color: "#fff"}}
             >
                 {"<"}
             </button>
             <button
                 onClick={nextSlide}
-                className="absolute right-0 top-80 transform -translate-y-1/2 bg-[#2b3350] hover:bg-[#394063] px-3 py-1 rounded shadow transition-colors duration-200"
+                className="absolute right-0 top-80 transform -translate-y-1/2 bg-[#2b3350] hover:bg-[#394063] px-3 py-1 rounded shadow-lg transition-all duration-500 hover:scale-110 slide-transition"
                 style={{color: "#fff"}}
             >
                 {">"}
