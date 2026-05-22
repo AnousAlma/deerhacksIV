@@ -4,6 +4,13 @@ import { NextResponse } from "next/server";
 
 import { getById as getPostById, create as createPost } from "@/lib/db/dal/post";
 import EventPost from "@/lib/db/models/post";
+import { matchEventTags } from "@/lib/utils/matchEventTags";
+
+function hasTags(tags: unknown): boolean {
+    if (Array.isArray(tags)) return tags.length > 0;
+    if (typeof tags === "string") return tags.trim().length > 0;
+    return false;
+}
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
     console.log(params)
@@ -55,9 +62,26 @@ export async function POST(req: Request) {
         if (!title || !description || !startDate || !location) {
             return NextResponse.json({ error: "title, description, startDate and location are required" }, { status: 400 });
         }
-        if (tags && Array.isArray(tags)) {
+        if (Array.isArray(tags)) {
             data.tags = tags.join(",");
+        } else if (typeof tags === "string" && tags.trim()) {
+            data.tags = tags.trim();
         }
+
+        if (!hasTags(data.tags)) {
+            try {
+                const matched = await matchEventTags({
+                    title,
+                    description,
+                    location,
+                    organizer: ownerId,
+                });
+                data.tags = matched.tagsString;
+            } catch (tagError) {
+                console.error("Server-side tag generation failed:", tagError);
+            }
+        }
+
         const newPost = await EventPost.create(data);
 
         return NextResponse.json({ message: "Post created", post: newPost }, { status: 201 });

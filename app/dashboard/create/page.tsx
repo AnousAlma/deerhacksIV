@@ -48,6 +48,8 @@ export default function CreateEventPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsSubmitting(true);
+        setError("");
     
         if (!session || !session.user) {
             setError("Access denied!");
@@ -70,7 +72,7 @@ export default function CreateEventPage() {
 
     
             console.log(cloudinaryLink); // Log the Cloudinary link for debugging
-            const tags = await parseEventDetails(formData.title, formData.description, formData.location, formData.startDate.toISOString());
+            const tags = await parseEventDetails(formData.title, formData.description, formData.location);
 
             const data = {
                 ...formData,
@@ -321,7 +323,7 @@ export default function CreateEventPage() {
                             type="submit"
                             className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isSubmitting ? "Creating Event..." : "Create Event"}
+                            {isSubmitting ? "Generating tags & creating event..." : "Create Event"}
                         </motion.button>
                     </form>
                 </motion.div>
